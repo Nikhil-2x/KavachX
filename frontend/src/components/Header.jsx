@@ -5,7 +5,8 @@ export default function Header({ activeTab, setActiveTab, isAuthenticated, user,
   const tabs = [
     { id: 'home', label: 'Home' },
     { id: 'features', label: 'Features' },
-    { id: 'about', label: 'About' }
+    { id: 'about', label: 'About' },
+    ...(isAuthenticated ? [{ id: 'inbox', label: 'Inbox' }] : []),
   ];
 
   return (
