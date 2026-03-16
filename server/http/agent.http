@@ -1,0 +1,8 @@
+###
+
+POST https://nick-2x-email-spam.hf.space/predict
+Content-Type: application/json  
+
+{
+  "text": "We noticed a login attempt from an unrecognized device. If this was not you, please secure your account immediately."
+}
