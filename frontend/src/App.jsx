@@ -1,48 +1,115 @@
-import React, { useState } from 'react';
+﻿import React, { useEffect, useRef, useState } from 'react';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import Features from './components/Features';
 import About from './components/About';
-import LoginPage from './components/LoginPage';
+import GmailInbox from './components/GmailInbox';
+import io from 'socket.io-client';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:2000';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('home');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState(null);
-  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [emails, setEmails] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const socketRef = useRef(null);
+
+  const checkAuthStatus = async () => {
+    try {
+      const res = await fetch(`${API_URL}/auth/status`);
+      const data = await res.json();
+      const auth = Boolean(data.authenticated);
+      setIsAuthenticated(auth);
+
+      // When authenticated, show inbox by default
+      if (auth) setActiveTab('inbox');
+    } catch (err) {
+      console.error('Failed to check auth status', err);
+    }
+  };
+
+  const fetchLatestEmails = async () => {
+    setError('');
+    setLoading(true);
+
+    try {
+      const res = await fetch(`${API_URL}/gmail/latest`);
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || 'Failed to load emails');
+      }
+      const data = await res.json();
+      setEmails(data);
+    } catch (err) {
+      console.error('Error fetching emails', err);
+      setError(err.message || 'Failed to fetch emails');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const startWatch = async () => {
+    try {
+      await fetch(`${API_URL}/gmail/start-watch`, { method: 'POST' });
+    } catch (err) {
+      console.error('Failed to start watch', err);
+      setError('Failed to start email watch');
+    }
+  };
 
   const handleLoginClick = () => {
-    setShowLoginModal(true);
+    window.location.href = `${API_URL}/auth/google`;
   };
 
-
-  const handleCloseModals = () => {
-    setShowLoginModal(false);
-  };
-
-  const handleAuthSuccess = (userData) => {
-    setUser(userData);
-    setIsAuthenticated(true);
-    handleCloseModals();
-    // Store user data in localStorage for persistence
-    localStorage.setItem('user', JSON.stringify(userData));
-  };
-
-  const handleLogout = () => {
-    setUser(null);
-    setIsAuthenticated(false);
-    localStorage.removeItem('user');
-  };
-
-  // Check if user is logged in on mount
-  React.useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-      setIsAuthenticated(true);
+  const handleLogout = async () => {
+    try {
+      await fetch(`${API_URL}/auth/logout`, { method: 'POST' });
+    } catch (err) {
+      console.error('Logout error', err);
     }
+
+    setIsAuthenticated(false);
+    setEmails([]);
+    setError('');
+
+    if (socketRef.current) {
+      socketRef.current.disconnect();
+      socketRef.current = null;
+    }
+  };
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('auth') === 'success') {
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
+    checkAuthStatus();
   }, []);
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    fetchLatestEmails();
+    startWatch();
+
+    if (!socketRef.current) {
+      socketRef.current = io(API_URL);
+      socketRef.current.on('new-email', (email) => {
+        setEmails((prev) => [email, ...prev]);
+      });
+    }
+
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+        socketRef.current = null;
+      }
+    };
+  }, [isAuthenticated]);
 
   return (
     <div className="min-h-screen bg-white">
@@ -50,25 +117,30 @@ export default function App() {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         isAuthenticated={isAuthenticated}
-        user={user}
+        user={null}
         onLogout={handleLogout}
         onLoginClick={handleLoginClick}
       />
 
       <main>
         {activeTab === 'home' && <Hero />}
+
+        {activeTab === 'inbox' && (
+          <GmailInbox
+            isAuthenticated={isAuthenticated}
+            emails={emails}
+            loading={loading}
+            error={error}
+            onConnect={handleLoginClick}
+            onRefresh={fetchLatestEmails}
+            onStartWatch={startWatch}
+            onLogout={handleLogout}
+          />
+        )}
+
         {activeTab === 'features' && <Features />}
         {activeTab === 'about' && <About />}
       </main>
-
-      {/* Login Modal */}
-      {showLoginModal && (
-        <LoginPage
-          onClose={handleCloseModals}
-          onGoogleSuccess={handleAuthSuccess}
-        />
-      )}
-
     </div>
   );
 }
