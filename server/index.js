@@ -8,7 +8,6 @@ import * as url from 'url';
 import { initSocket } from './socket/socketServer.js';
 import gmailRoutes from './routes/gmailRoutes.js';
 
-
 const app = express();
 const server = http.createServer(app);
 

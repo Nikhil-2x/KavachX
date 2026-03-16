@@ -1,6 +1,8 @@
 import express from 'express';
 import { getAuthUrl, getTokens, setCredentials } from '../config/googleOAuth.js';
 import { getLatestEmails, startWatch, stopWatch } from '../services/gmailService.js';
+import { predict } from '../services/predictService.js';
+import { reasonAboutPrediction } from '../services/agentService.js';
 
 const router = express.Router();
 
@@ -59,7 +61,7 @@ router.get('/gmail/latest', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch latest emails.', details: error.message });
   }
 });
-
+//start watch is for 
 router.post('/gmail/start-watch', (req, res) => {
   if (!userTokens) {
     return res.status(401).json({ error: 'Unauthorized. Please authenticate via /auth/google first.' });
@@ -79,6 +81,46 @@ router.post('/gmail/start-watch', (req, res) => {
 router.post('/gmail/stop-watch', (req, res) => {
   const result = stopWatch();
   res.json(result);
+});
+
+/**
+ * Route: POST /predict
+ * Description: Get prediction from external API and get Groq reasoning
+ * Request body: { emailBody: string } or plain text
+ * Response: { prediction: {...}, reasoning: {...}, timestamp: string }
+ */
+router.post('/predict', async (req, res) => {
+  try {
+    // Get the email body from the request
+    const emailBody = typeof req.body === 'string' ? req.body : req.body?.emailBody;
+
+    if (!emailBody) {
+      return res.status(400).json({
+        error: 'Missing email body in request',
+      });
+    }
+
+    // Step 1: Get prediction from external API
+    console.log('Sending to prediction API:', { text: emailBody });
+    const prediction = await predict(emailBody);
+    console.log('Prediction result:', prediction);
+
+    // Step 2: Get reasoning from Groq agent about the prediction
+    const reasoning = await reasonAboutPrediction(emailBody, prediction);
+
+    // Step 3: Return combined response
+    res.json({
+      prediction,
+      reasoning,
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    console.error('Error in /predict:', error.message);
+    res.status(500).json({
+      error: 'Failed to process email',
+      details: error.message,
+    });
+  }
 });
 
 export default router;
