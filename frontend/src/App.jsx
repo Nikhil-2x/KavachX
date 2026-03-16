@@ -3,6 +3,7 @@ import Header from './components/Header';
 import Hero from './components/Hero';
 import Features from './components/Features';
 import About from './components/About';
+import CyberAwareness from './components/CyberAwareness'; 
 import GmailInbox from './components/GmailInbox';
 import io from 'socket.io-client';
 
@@ -25,7 +26,7 @@ export default function App() {
       setIsAuthenticated(auth);
 
       // When authenticated, show inbox by default
-      if (auth) setActiveTab('inbox');
+      if (auth) setActiveTab('home');
     } catch (err) {
       console.error('Failed to check auth status', err);
     }
@@ -140,6 +141,8 @@ export default function App() {
 
         {activeTab === 'features' && <Features />}
         {activeTab === 'about' && <About />}
+        {activeTab === 'cyberawareness' && <CyberAwareness />}
+        
       </main>
     </div>
   );

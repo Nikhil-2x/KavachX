@@ -11,7 +11,7 @@ export default function Header({ activeTab, setActiveTab, isAuthenticated, user,
     { id: 'features', label: 'Features' },
     { id: 'about', label: 'About' },
     ...(isAuthenticated ? [{ id: 'inbox', label: 'Inbox' }] : []),
-    { id: 'CyberAwareness', label: 'Cyber Awareness' },
+    { id: 'cyberawareness', label: 'Cyber Awareness' },
   ];
 
   return (
