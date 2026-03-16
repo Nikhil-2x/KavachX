@@ -1,6 +1,7 @@
 import React from 'react';
+import { LogOut } from 'lucide-react';
 
-export default function Header({ activeTab, setActiveTab }) {
+export default function Header({ activeTab, setActiveTab, isAuthenticated, user, onLogout, onLoginClick }) {
   const tabs = [
     { id: 'home', label: 'Home' },
     { id: 'features', label: 'Features' },
@@ -17,7 +18,7 @@ export default function Header({ activeTab, setActiveTab }) {
           </div>
 
           {/* Navigation */}
-          <nav className="flex gap-8">
+          <nav className="flex gap-8 items-center">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
@@ -35,6 +36,40 @@ export default function Header({ activeTab, setActiveTab }) {
               </button>
             ))}
           </nav>
+
+          {/* Auth Section */}
+          <div className="flex items-center gap-4">
+            {isAuthenticated ? (
+              <>
+                <div className="flex items-center gap-3">
+                  {user?.picture && (
+                    <img
+                      src={user.picture}
+                      alt={user.name}
+                      className="w-8 h-8 rounded-full"
+                    />
+                  )}
+                  <span className="text-sm font-medium text-gray-700">
+                    {user?.name || 'User'}
+                  </span>
+                </div>
+                <button
+                  onClick={onLogout}
+                  className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span className="text-sm font-medium">Logout</span>
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={onLoginClick}
+                className="px-6 py-2 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 transition-colors"
+              >
+                Sign In
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </header>
