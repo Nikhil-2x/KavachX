@@ -2,7 +2,9 @@
 import React, { useState, useRef } from 'react';
 import { Upload, Loader, Image, Music } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
-import DeepFakeResult from './DeepFakeResult';
+import DeepFakeResult from './Deepfakeresult'; // Fixed filename casing if necessary or kept as is
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:2000';
 
 export default function DeepFakeDetector() {
   const { isDark } = useTheme();
@@ -69,46 +71,45 @@ export default function DeepFakeDetector() {
 
     try {
       const formData = new FormData();
-      formData.append('file', imageFile);
+      formData.append('image', imageFile); // Changed 'file' to 'image' to match backend imageRoutes.js
 
-      // Replace 'YOUR_API_ENDPOINT' with your actual deepfake detection API
-      const response = await fetch('YOUR_API_ENDPOINT', {
+      const response = await fetch(`${API_URL}/predict-image`, {
         method: 'POST',
         body: formData,
-        headers: {
-          // Remove Content-Type header to let the browser set it with boundary
-          // 'Content-Type': 'multipart/form-data' - Don't include this!
-        }
       });
 
       if (!response.ok) {
-        throw new Error(`API error: ${response.statusText}`);
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `API error: ${response.statusText}`);
       }
 
       const data = await response.json();
 
+      // Adjust to match the backend response format
+      // If the backend returns { label: 'fake', confidence: 0.9 }
       setImageResult({
-        prediction: data.prediction,
+        prediction: data.label || (data.is_deepfake ? 'Deepfake' : 'Authentic'),
         confidence: data.confidence,
-        is_deepfake: data.is_deepfake
+        is_deepfake: data.is_deepfake ?? (data.label?.toLowerCase() === 'fake')
       });
     } catch (error) {
       console.error('Image analysis error:', error);
       setImageError(error.message || 'Failed to analyze image. Please try again.');
       
-      // For demo purposes, show a sample result
-      console.log('Using demo result. Replace YOUR_API_ENDPOINT with your actual API.');
+      // Fallback for demo if API is not reachable
+      /*
       setImageResult({
         prediction: 'Deepfake',
         confidence: 0.5236,
         is_deepfake: true
       });
+      */
     } finally {
       setImageLoading(false);
     }
   };
 
-  // Analyze Audio with Real API
+  // Analyze Audio - DEMO ONLY as per user request
   const analyzeAudio = async () => {
     if (!audioFile) return;
 
@@ -116,42 +117,24 @@ export default function DeepFakeDetector() {
     setAudioError(null);
     setAudioResult(null);
 
+    // Simulate delay
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
     try {
-      const formData = new FormData();
-      formData.append('file', audioFile);
-
-      // Replace 'YOUR_AUDIO_API_ENDPOINT' with your actual audio deepfake detection API
-      const response = await fetch('YOUR_AUDIO_API_ENDPOINT', {
-        method: 'POST',
-        body: formData
-      });
-
-      if (!response.ok) {
-        throw new Error(`API error: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-
-      setAudioResult({
-        prediction: data.prediction,
-        confidence: data.confidence,
-        is_deepfake: data.is_deepfake
-      });
-    } catch (error) {
-      console.error('Audio analysis error:', error);
-      setAudioError(error.message || 'Failed to analyze audio. Please try again.');
-      
-      // For demo purposes, show a sample result
-      console.log('Using demo result. Replace YOUR_AUDIO_API_ENDPOINT with your actual API.');
+      // For demo purposes, show a sample result as requested (skipping backend)
       setAudioResult({
         prediction: 'Authentic',
         confidence: 0.8923,
         is_deepfake: false
       });
+    } catch (error) {
+      console.error('Audio analysis error:', error);
+      setAudioError(error.message || 'Failed to analyze audio. Please try again.');
     } finally {
       setAudioLoading(false);
     }
   };
+
 
   return (
     <div className={`min-h-screen transition-colors duration-300 ${

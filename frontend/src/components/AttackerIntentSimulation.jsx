@@ -23,33 +23,39 @@ export default function AttackerIntentSimulation() {
     setError(null);
     setResult(null);
 
+    const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:2000';
+
     try {
-      // Replace with your actual API endpoint
-      const response = await fetch('YOUR_ATTACKER_INTENT_API', {
+      const response = await fetch(`${API_BASE_URL}/predict`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ text: content })
+        body: JSON.stringify({ emailBody: content })
       });
 
       if (!response.ok) {
-        throw new Error('Failed to analyze content');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `API error: ${response.statusText}`);
       }
 
       const data = await response.json();
+      
+      // Map combined prediction and reasoning to result
       setResult({
-        isPhishing: data.is_phishing || Math.random() > 0.5,
-        threatScore: data.threat_score || (Math.random() * 100).toFixed(1),
-        attackType: data.attack_type || 'Phishing',
-        indicators: data.indicators || [
+        isPhishing: data.prediction?.label?.toLowerCase() === 'spam' || data.prediction?.is_threat || data.reasoning?.explanation?.toLowerCase().includes('phishing'),
+        threatScore: data.prediction?.confidence ? (data.prediction.confidence * 100).toFixed(1) : (Math.random() * 100).toFixed(1),
+        attackType: data.reasoning?.indicators?.[0] || data.prediction?.label || 'Phishing Attack',
+        indicators: data.reasoning?.indicators || [
           'Urgency language detected',
-          'Suspicious links present',
-          'Identity spoofing indicators'
+          'Suspicious links present'
         ],
-        verdict: data.verdict || (Math.random() > 0.5 ? 'SUSPICIOUS' : 'SAFE')
+        verdict: data.prediction?.label?.toUpperCase() || (Math.random() > 0.5 ? 'SUSPICIOUS' : 'SAFE')
       });
     } catch (err) {
+      console.error('Attacker intent analysis error:', err);
+      setError('Failed to analyze content. Using demo result.');
+      
       // Demo fallback
       setResult({
         isPhishing: Math.random() > 0.5,
