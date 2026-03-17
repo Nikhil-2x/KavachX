@@ -3,8 +3,14 @@ import Header from './components/Header';
 import Hero from './components/Hero';
 import Features from './components/Features';
 import About from './components/About';
+import CyberAwareness from './components/CyberAwareness'; 
 import GmailInbox from './components/GmailInbox';
+import DeepFakeDetector from './components/DeepFakeDetector';
 import io from 'socket.io-client';
+import WebsiteDetector from './components/WebsiteDetector';
+import AttackerIntentSimulation from './components/AttackerIntentSimulation';
+import ThreatSimilarityEngine from './components/ThreatSimilarityEngine';
+import ChatbotAgent from './components/ChatbotAgent';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:2000';
 
@@ -25,7 +31,7 @@ export default function App() {
       setIsAuthenticated(auth);
 
       // When authenticated, show inbox by default
-      if (auth) setActiveTab('inbox');
+      if (auth) setActiveTab('home');
     } catch (err) {
       console.error('Failed to check auth status', err);
     }
@@ -138,8 +144,16 @@ export default function App() {
           />
         )}
 
-        {activeTab === 'features' && <Features />}
+        {activeTab === 'features' && <Features setActiveTab={setActiveTab} />}
         {activeTab === 'about' && <About />}
+        {activeTab === 'cyberawareness' && <CyberAwareness />}
+        {activeTab === 'deepfake' && <DeepFakeDetector />}
+
+        {/* ⭐ NEW: Security Feature Pages */}
+        {activeTab === 'website-detector' && <WebsiteDetector />}
+        {activeTab === 'attacker-intent' && <AttackerIntentSimulation />}
+        {activeTab === 'threat-similarity' && <ThreatSimilarityEngine />}
+        <ChatbotAgent />
       </main>
     </div>
   );

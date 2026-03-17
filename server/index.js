@@ -1,3 +1,4 @@
+// server/index.js - UPDATED VERSION
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -9,6 +10,7 @@ import { initSocket } from './socket/socketServer.js';
 import gmailRoutes from './routes/gmailRoutes.js';
 import urlRoute from './routes/urlRoute.js';
 import imageRoutes from './routes/imageRoutes.js';
+import youtubeRoutes from './routes/youtubeRoutes.js'; // ADD THIS LINE
 
 const app = express();
 const server = http.createServer(app);
@@ -24,6 +26,7 @@ app.use(express.json());
 app.use('/', gmailRoutes);
 app.use('/', urlRoute);
 app.use('/', imageRoutes);
+app.use('/youtube', youtubeRoutes); // ADD THIS LINE
 
 // Environment variables
 const PORT = process.env.PORT || 3000;
