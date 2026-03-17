@@ -53,8 +53,8 @@ export async function analyzeEmail(emailSubject, emailBody, classification) {
 
   // Truncate email body to avoid 413 "Request too large" errors
   const MAX_CHARACTERS = 5000;
-  const truncatedBody = emailBody && emailBody.length > MAX_CHARACTERS 
-    ? emailBody.substring(0, MAX_CHARACTERS) + '... [Truncated for brevity]' 
+  const truncatedBody = emailBody && emailBody.length > MAX_CHARACTERS
+    ? emailBody.substring(0, MAX_CHARACTERS) + '... [Truncated for brevity]'
     : emailBody;
 
   const systemPrompt = `Analyze email for security:
@@ -84,7 +84,7 @@ Class: ${classification}`;
     }
   } catch (error) {
     console.error('Error calling Groq API:', error.message);
-    
+
     // Graceful handling for rate limits
     if (error.message.includes('rate_limit_exceeded') || error.status === 429) {
       return {
@@ -113,16 +113,19 @@ export async function reasonAboutPrediction(emailBody, predictionResult) {
 
   // Truncate email body to avoid 413 "Request too large" errors
   const MAX_CHARACTERS = 5000;
-  const truncatedBody = emailBody && emailBody.length > MAX_CHARACTERS 
-    ? emailBody.substring(0, MAX_CHARACTERS) + '... [Truncated for brevity]' 
+  const truncatedBody = emailBody && emailBody.length > MAX_CHARACTERS
+    ? emailBody.substring(0, MAX_CHARACTERS) + '... [Truncated for brevity]'
     : emailBody;
 
-  const systemPrompt = `Explain security prediction:
-- Output valid JSON: {explanation, indicators, recommended_steps, resources}
-- No markdown. Keep it focused.`;
+  const isUrl = emailBody.startsWith('http://') || emailBody.startsWith('https://');
+  const contextType = isUrl ? 'Website URL' : 'Email Content';
 
-  const userPrompt = `Body: ${truncatedBody}
-Result: ${JSON.stringify(predictionResult)}`;
+  const systemPrompt = `Explain security prediction:
+- Prediction: ${JSON.stringify(predictionResult)}
+- Provide JSON: {explanation, indicators, recommended_steps}
+- Be expert, concise.`;
+
+  const userPrompt = `${contextType}: ${emailBody}`;
 
   const messages = [
     { _getType: () => 'system', content: systemPrompt },
@@ -143,7 +146,7 @@ Result: ${JSON.stringify(predictionResult)}`;
     }
   } catch (error) {
     console.error('Error calling Groq API:', error.message);
-    
+
     // Graceful handling for rate limits
     if (error.message.includes('rate_limit_exceeded') || error.status === 429) {
       return {

@@ -8,7 +8,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:2000';
 
 export default function DeepFakeDetector() {
   const { isDark } = useTheme();
-  
+
   // Image Detection State
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
@@ -32,10 +32,10 @@ export default function DeepFakeDetector() {
     const file = e.target.files?.[0];
     setImageError(null);
     setImageResult(null);
-    
+
     if (file && file.type.startsWith('image/')) {
       setImageFile(file);
-      
+
       // Create preview
       const reader = new FileReader();
       reader.onload = (event) => {
@@ -52,7 +52,7 @@ export default function DeepFakeDetector() {
     const file = e.target.files?.[0];
     setAudioError(null);
     setAudioResult(null);
-    
+
     if (file && (file.type.startsWith('audio/') || file.type === 'application/octet-stream')) {
       setAudioFile(file);
       setAudioPreview(URL.createObjectURL(file));
@@ -95,7 +95,7 @@ export default function DeepFakeDetector() {
     } catch (error) {
       console.error('Image analysis error:', error);
       setImageError(error.message || 'Failed to analyze image. Please try again.');
-      
+
       // Fallback for demo if API is not reachable
       /*
       setImageResult({
@@ -137,66 +137,56 @@ export default function DeepFakeDetector() {
 
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${
-      isDark
+    <div className={`min-h-screen transition-colors duration-300 ${isDark
         ? 'bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950'
         : 'bg-gradient-to-br from-gray-50 via-white to-gray-100'
-    }`}>
+      }`}>
       {/* Background Decorative Elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className={`absolute top-0 left-0 w-96 h-96 rounded-full mix-blend-multiply filter blur-3xl opacity-10 ${
-          isDark ? 'bg-red-600' : 'bg-red-400'
-        }`}></div>
-        <div className={`absolute top-1/3 right-0 w-96 h-96 rounded-full mix-blend-multiply filter blur-3xl opacity-10 ${
-          isDark ? 'bg-orange-600' : 'bg-orange-400'
-        }`}></div>
-        <div className={`absolute bottom-0 left-1/2 w-96 h-96 rounded-full mix-blend-multiply filter blur-3xl opacity-10 ${
-          isDark ? 'bg-yellow-600' : 'bg-yellow-400'
-        }`}></div>
+        <div className={`absolute top-0 left-0 w-96 h-96 rounded-full mix-blend-multiply filter blur-3xl opacity-10 ${isDark ? 'bg-red-600' : 'bg-red-400'
+          }`}></div>
+        <div className={`absolute top-1/3 right-0 w-96 h-96 rounded-full mix-blend-multiply filter blur-3xl opacity-10 ${isDark ? 'bg-orange-600' : 'bg-orange-400'
+          }`}></div>
+        <div className={`absolute bottom-0 left-1/2 w-96 h-96 rounded-full mix-blend-multiply filter blur-3xl opacity-10 ${isDark ? 'bg-yellow-600' : 'bg-yellow-400'
+          }`}></div>
       </div>
 
       {/* Main Content */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20">
-        
+
         {/* Header */}
         <div className="mb-16 text-center">
-          <h1 className={`text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r ${
-            isDark
+          <h1 className={`text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r ${isDark
               ? 'from-red-400 via-orange-400 to-yellow-400 bg-clip-text text-transparent'
               : 'from-red-600 via-orange-600 to-yellow-600 bg-clip-text text-transparent'
-          }`}>
+            }`}>
             DeepFake Detector
           </h1>
-          <p className={`text-lg md:text-xl max-w-2xl mx-auto ${
-            isDark ? 'text-gray-300' : 'text-gray-700'
-          }`}>
+          <p className={`text-lg md:text-xl max-w-2xl mx-auto ${isDark ? 'text-gray-300' : 'text-gray-700'
+            }`}>
             Advanced AI-powered detection for images and audio. Identify manipulated media with cutting-edge analysis.
           </p>
         </div>
 
         {/* Two Section Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-          
+
           {/* ===== IMAGE DEEPFAKE DETECTION ===== */}
           <div>
-            <div className={`rounded-2xl transition-all duration-300 ${
-              isDark
+            <div className={`rounded-2xl transition-all duration-300 ${isDark
                 ? 'bg-white/5 border border-white/10 hover:border-red-500/50 hover:shadow-lg hover:shadow-red-500/20'
                 : 'bg-gray-100 border border-gray-200 hover:border-red-500/50 hover:shadow-lg hover:shadow-red-500/20'
-            }`}>
+              }`}>
               <div className="p-8">
                 {/* Section Title */}
                 <div className="flex items-center gap-3 mb-6">
-                  <div className={`p-3 rounded-lg ${
-                    isDark ? 'bg-red-500/20' : 'bg-red-100'
-                  }`}>
-                    <Image className={`w-6 h-6 ${
-                      isDark ? 'text-red-400' : 'text-red-600'
-                    }`} />
+                  <div className={`p-3 rounded-lg ${isDark ? 'bg-red-500/20' : 'bg-red-100'
+                    }`}>
+                    <Image className={`w-6 h-6 ${isDark ? 'text-red-400' : 'text-red-600'
+                      }`} />
                   </div>
-                  <h2 className={`text-2xl font-bold ${
-                    isDark ? 'text-white' : 'text-gray-900'
-                  }`}>
+                  <h2 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'
+                    }`}>
                     Image Analysis
                   </h2>
                 </div>
@@ -207,25 +197,21 @@ export default function DeepFakeDetector() {
                     {!imagePreview ? (
                       <div
                         onClick={() => imageInputRef.current?.click()}
-                        className={`mb-6 p-8 rounded-xl border-2 border-dashed transition-all duration-300 cursor-pointer group ${
-                          isDark
+                        className={`mb-6 p-8 rounded-xl border-2 border-dashed transition-all duration-300 cursor-pointer group ${isDark
                             ? 'border-red-500/30 hover:border-red-500 hover:bg-red-500/10'
                             : 'border-red-300 hover:border-red-500 hover:bg-red-50'
-                        }`}
+                          }`}
                       >
                         <div className="flex flex-col items-center gap-3">
-                          <Upload className={`w-12 h-12 transition-all duration-300 group-hover:scale-110 ${
-                            isDark ? 'text-red-400' : 'text-red-600'
-                          }`} />
+                          <Upload className={`w-12 h-12 transition-all duration-300 group-hover:scale-110 ${isDark ? 'text-red-400' : 'text-red-600'
+                            }`} />
                           <div className="text-center">
-                            <p className={`font-semibold mb-1 ${
-                              isDark ? 'text-white' : 'text-gray-900'
-                            }`}>
+                            <p className={`font-semibold mb-1 ${isDark ? 'text-white' : 'text-gray-900'
+                              }`}>
                               Click to upload image
                             </p>
-                            <p className={`text-sm ${
-                              isDark ? 'text-gray-400' : 'text-gray-600'
-                            }`}>
+                            <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'
+                              }`}>
                               or drag and drop
                             </p>
                           </div>
@@ -233,9 +219,8 @@ export default function DeepFakeDetector() {
                       </div>
                     ) : (
                       <div className="mb-6 space-y-4">
-                        <div className={`rounded-lg overflow-hidden border ${
-                          isDark ? 'border-red-500/30' : 'border-red-300'
-                        }`}>
+                        <div className={`rounded-lg overflow-hidden border ${isDark ? 'border-red-500/30' : 'border-red-300'
+                          }`}>
                           <img
                             src={imagePreview}
                             alt="Preview"
@@ -244,11 +229,10 @@ export default function DeepFakeDetector() {
                         </div>
                         <button
                           onClick={() => imageInputRef.current?.click()}
-                          className={`w-full py-2 rounded-lg transition-all duration-300 ${
-                            isDark
+                          className={`w-full py-2 rounded-lg transition-all duration-300 ${isDark
                               ? 'bg-white/10 hover:bg-white/20 text-white'
                               : 'bg-gray-200 hover:bg-gray-300 text-gray-900'
-                          }`}
+                            }`}
                         >
                           Change Image
                         </button>
@@ -257,11 +241,10 @@ export default function DeepFakeDetector() {
 
                     {/* Error Message */}
                     {imageError && (
-                      <div className={`mb-6 p-4 rounded-lg border ${
-                        isDark
+                      <div className={`mb-6 p-4 rounded-lg border ${isDark
                           ? 'bg-red-500/10 border-red-500/30 text-red-400'
                           : 'bg-red-50 border-red-300 text-red-600'
-                      }`}>
+                        }`}>
                         {imageError}
                       </div>
                     )}
@@ -270,15 +253,14 @@ export default function DeepFakeDetector() {
                     <button
                       onClick={analyzeImage}
                       disabled={!imageFile || imageLoading}
-                      className={`w-full py-3 px-4 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${
-                        imageLoading || !imageFile
+                      className={`w-full py-3 px-4 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${imageLoading || !imageFile
                           ? isDark
                             ? 'bg-red-500/30 text-gray-400 cursor-not-allowed'
                             : 'bg-red-100 text-gray-400 cursor-not-allowed'
                           : isDark
                             ? 'bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-500 hover:to-orange-500 text-white hover:shadow-lg hover:shadow-red-500/50'
                             : 'bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-500 hover:to-orange-500 text-white hover:shadow-lg hover:shadow-red-500/50'
-                      }`}
+                        }`}
                     >
                       {imageLoading ? (
                         <>
@@ -302,11 +284,10 @@ export default function DeepFakeDetector() {
                         setImagePreview(null);
                         setImageFile(null);
                       }}
-                      className={`w-full py-3 px-4 rounded-lg font-semibold transition-all duration-300 ${
-                        isDark
+                      className={`w-full py-3 px-4 rounded-lg font-semibold transition-all duration-300 ${isDark
                           ? 'bg-white/10 hover:bg-white/20 text-white'
                           : 'bg-gray-200 hover:bg-gray-300 text-gray-900'
-                      }`}
+                        }`}
                     >
                       Analyze Another Image
                     </button>
@@ -326,24 +307,20 @@ export default function DeepFakeDetector() {
 
           {/* ===== AUDIO DEEPFAKE DETECTION ===== */}
           <div>
-            <div className={`rounded-2xl transition-all duration-300 ${
-              isDark
+            <div className={`rounded-2xl transition-all duration-300 ${isDark
                 ? 'bg-white/5 border border-white/10 hover:border-orange-500/50 hover:shadow-lg hover:shadow-orange-500/20'
                 : 'bg-gray-100 border border-gray-200 hover:border-orange-500/50 hover:shadow-lg hover:shadow-orange-500/20'
-            }`}>
+              }`}>
               <div className="p-8">
                 {/* Section Title */}
                 <div className="flex items-center gap-3 mb-6">
-                  <div className={`p-3 rounded-lg ${
-                    isDark ? 'bg-orange-500/20' : 'bg-orange-100'
-                  }`}>
-                    <Music className={`w-6 h-6 ${
-                      isDark ? 'text-orange-400' : 'text-orange-600'
-                    }`} />
+                  <div className={`p-3 rounded-lg ${isDark ? 'bg-orange-500/20' : 'bg-orange-100'
+                    }`}>
+                    <Music className={`w-6 h-6 ${isDark ? 'text-orange-400' : 'text-orange-600'
+                      }`} />
                   </div>
-                  <h2 className={`text-2xl font-bold ${
-                    isDark ? 'text-white' : 'text-gray-900'
-                  }`}>
+                  <h2 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'
+                    }`}>
                     Audio Analysis
                   </h2>
                 </div>
@@ -354,25 +331,21 @@ export default function DeepFakeDetector() {
                     {!audioFile ? (
                       <div
                         onClick={() => audioInputRef.current?.click()}
-                        className={`mb-6 p-8 rounded-xl border-2 border-dashed transition-all duration-300 cursor-pointer group ${
-                          isDark
+                        className={`mb-6 p-8 rounded-xl border-2 border-dashed transition-all duration-300 cursor-pointer group ${isDark
                             ? 'border-orange-500/30 hover:border-orange-500 hover:bg-orange-500/10'
                             : 'border-orange-300 hover:border-orange-500 hover:bg-orange-50'
-                        }`}
+                          }`}
                       >
                         <div className="flex flex-col items-center gap-3">
-                          <Upload className={`w-12 h-12 transition-all duration-300 group-hover:scale-110 ${
-                            isDark ? 'text-orange-400' : 'text-orange-600'
-                          }`} />
+                          <Upload className={`w-12 h-12 transition-all duration-300 group-hover:scale-110 ${isDark ? 'text-orange-400' : 'text-orange-600'
+                            }`} />
                           <div className="text-center">
-                            <p className={`font-semibold mb-1 ${
-                              isDark ? 'text-white' : 'text-gray-900'
-                            }`}>
+                            <p className={`font-semibold mb-1 ${isDark ? 'text-white' : 'text-gray-900'
+                              }`}>
                               Click to upload audio
                             </p>
-                            <p className={`text-sm ${
-                              isDark ? 'text-gray-400' : 'text-gray-600'
-                            }`}>
+                            <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'
+                              }`}>
                               or drag and drop
                             </p>
                           </div>
@@ -380,12 +353,10 @@ export default function DeepFakeDetector() {
                       </div>
                     ) : (
                       <div className="mb-6 space-y-4">
-                        <div className={`p-4 rounded-lg border ${
-                          isDark ? 'border-orange-500/30 bg-white/5' : 'border-orange-300 bg-orange-50'
-                        }`}>
-                          <p className={`text-sm font-semibold mb-2 ${
-                            isDark ? 'text-white' : 'text-gray-900'
+                        <div className={`p-4 rounded-lg border ${isDark ? 'border-orange-500/30 bg-white/5' : 'border-orange-300 bg-orange-50'
                           }`}>
+                          <p className={`text-sm font-semibold mb-2 ${isDark ? 'text-white' : 'text-gray-900'
+                            }`}>
                             {audioFile.name}
                           </p>
                           <audio
@@ -396,11 +367,10 @@ export default function DeepFakeDetector() {
                         </div>
                         <button
                           onClick={() => audioInputRef.current?.click()}
-                          className={`w-full py-2 rounded-lg transition-all duration-300 ${
-                            isDark
+                          className={`w-full py-2 rounded-lg transition-all duration-300 ${isDark
                               ? 'bg-white/10 hover:bg-white/20 text-white'
                               : 'bg-gray-200 hover:bg-gray-300 text-gray-900'
-                          }`}
+                            }`}
                         >
                           Change Audio
                         </button>
@@ -409,11 +379,10 @@ export default function DeepFakeDetector() {
 
                     {/* Error Message */}
                     {audioError && (
-                      <div className={`mb-6 p-4 rounded-lg border ${
-                        isDark
+                      <div className={`mb-6 p-4 rounded-lg border ${isDark
                           ? 'bg-red-500/10 border-red-500/30 text-red-400'
                           : 'bg-red-50 border-red-300 text-red-600'
-                      }`}>
+                        }`}>
                         {audioError}
                       </div>
                     )}
@@ -422,15 +391,14 @@ export default function DeepFakeDetector() {
                     <button
                       onClick={analyzeAudio}
                       disabled={!audioFile || audioLoading}
-                      className={`w-full py-3 px-4 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${
-                        audioLoading || !audioFile
+                      className={`w-full py-3 px-4 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${audioLoading || !audioFile
                           ? isDark
                             ? 'bg-orange-500/30 text-gray-400 cursor-not-allowed'
                             : 'bg-orange-100 text-gray-400 cursor-not-allowed'
                           : isDark
                             ? 'bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-500 hover:to-yellow-500 text-white hover:shadow-lg hover:shadow-orange-500/50'
                             : 'bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-500 hover:to-yellow-500 text-white hover:shadow-lg hover:shadow-orange-500/50'
-                      }`}
+                        }`}
                     >
                       {audioLoading ? (
                         <>
@@ -454,11 +422,10 @@ export default function DeepFakeDetector() {
                         setAudioPreview(null);
                         setAudioFile(null);
                       }}
-                      className={`w-full py-3 px-4 rounded-lg font-semibold transition-all duration-300 ${
-                        isDark
+                      className={`w-full py-3 px-4 rounded-lg font-semibold transition-all duration-300 ${isDark
                           ? 'bg-white/10 hover:bg-white/20 text-white'
                           : 'bg-gray-200 hover:bg-gray-300 text-gray-900'
-                      }`}
+                        }`}
                     >
                       Analyze Another Audio
                     </button>
@@ -478,14 +445,12 @@ export default function DeepFakeDetector() {
         </div>
 
         {/* Info Section */}
-        <div className={`p-8 rounded-2xl border ${
-          isDark
+        <div className={`p-8 rounded-2xl border ${isDark
             ? 'bg-white/5 border-white/10'
             : 'bg-gray-100 border-gray-200'
-        }`}>
-          <h3 className={`text-xl font-bold mb-4 ${
-            isDark ? 'text-white' : 'text-gray-900'
           }`}>
+          <h3 className={`text-xl font-bold mb-4 ${isDark ? 'text-white' : 'text-gray-900'
+            }`}>
             How It Works
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -507,21 +472,18 @@ export default function DeepFakeDetector() {
               }
             ].map((item) => (
               <div key={item.step} className="text-center">
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 font-bold text-lg ${
-                  isDark
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 font-bold text-lg ${isDark
                     ? 'bg-gradient-to-r from-red-500 to-orange-500 text-white'
                     : 'bg-gradient-to-r from-red-600 to-orange-600 text-white'
-                }`}>
+                  }`}>
                   {item.step}
                 </div>
-                <h4 className={`font-semibold mb-2 ${
-                  isDark ? 'text-white' : 'text-gray-900'
-                }`}>
+                <h4 className={`font-semibold mb-2 ${isDark ? 'text-white' : 'text-gray-900'
+                  }`}>
                   {item.title}
                 </h4>
-                <p className={`text-sm ${
-                  isDark ? 'text-gray-400' : 'text-gray-600'
-                }`}>
+                <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'
+                  }`}>
                   {item.description}
                 </p>
               </div>

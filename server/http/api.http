@@ -1,25 +1,63 @@
-### Gmail API Integration Module REST API Tests
+### BITWIN Security Module REST API Tests
 @baseUrl = http://localhost:2000
 
 ---
 ### 1. Initiate OAuth Login
-### NOTE: Open this URL in your browser to actually authenticate and get the redirect to /callback.
+### Open this URL in your browser to authenticate.
 GET {{baseUrl}}/auth/google
 
+### 2. Check Auth Status
+GET {{baseUrl}}/auth/status
 
 ---
-### 2. Fetch Latest 10 Emails
-### Prerequisites: You must have completed Step 1 in your browser.
+### 3. Gmail Inbox Analysis
+### Fetch latest 5 emails (combined Inbox + Spam) with AI reasoning.
 GET {{baseUrl}}/gmail/latest
 
-
----
-### 3. Start Polling for New Emails
-### Initiates background interval checking every 20s.
+### 4. Start Real-time Monitoring
+### Starts polling Gmail every 20s.
 POST {{baseUrl}}/gmail/start-watch
 
+### 5. Stop Real-time Monitoring
+POST {{baseUrl}}/gmail/stop-watch
 
 ---
-### 4. Stop Polling
-### Terminates background interval check.
-POST {{baseUrl}}/gmail/stop-watch
+### 6. Website URL Detector
+### Analyze a suspicious URL for phishing or malicious patterns.
+POST {{baseUrl}}/url
+Content-Type: application/json
+
+{
+    "url": "https://secure-login-bank-verify-account.com/login"
+}
+
+### 7. Website URL Detector (Safe Example)
+POST {{baseUrl}}/url
+Content-Type: application/json
+
+{
+    "url": "https://www.google.com"
+}
+
+---
+### 8. Deepfake Photo Detector
+### Upload an image to check for AI generation/manipulation.
+POST {{baseUrl}}/predict-image
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="image"; filename="test.jpg"
+Content-Type: image/jpeg
+
+(Binary data would go here)
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+---
+### 9. Direct Text Analysis
+### Analyze a raw email body or text snippet manually.
+POST {{baseUrl}}/predict
+Content-Type: application/json
+
+{
+    "emailBody": "Urgent: Your account has been suspended. Click here to login: http://bit.ly/fake-link"
+}

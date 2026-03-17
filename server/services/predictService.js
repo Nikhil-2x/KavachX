@@ -12,6 +12,7 @@ export async function predict(emailBody) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text: emailBody }),
     });
+    console.log(response);
 
     if (!response.ok) {
       throw new Error(`Prediction API error: ${response.status} ${response.statusText}`);

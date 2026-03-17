@@ -33,10 +33,10 @@ export async function getLatestEmails() {
       maxResults: 5, // Fetch fewer from spam to keep initial load fast
     });
 
-    const messages = [
-      ...(inboxResponse.data.messages || []),
-      ...(spamResponse.data.messages || [])
-    ].slice(0, 5); // Only process top 5 total
+    const inboxMessages = (inboxResponse.data.messages || []).slice(0, 3);
+    const spamMessages = (spamResponse.data.messages || []).slice(0, 2);
+
+    const messages = [...inboxMessages, ...spamMessages];
     
     const extractedEmails = [];
 
@@ -47,6 +47,9 @@ export async function getLatestEmails() {
       const emailData = await extractEmailData(gmail, message.id);
       if (emailData) {
         state.processedMessages.add(message.id);
+        
+        // Mark as spam if it has the SPAM label
+        emailData.isSpam = emailData.labelIds?.includes('SPAM');
         
         // Enrich with prediction and reasoning
         try {
@@ -92,9 +95,9 @@ async function pollRecentEmails() {
     });
 
     const messages = [
-      ...(inboxResponse.data.messages || []),
-      ...(spamResponse.data.messages || [])
-    ].slice(0, 5);
+      ...(inboxResponse.data.messages || []).slice(0, 3),
+      ...(spamResponse.data.messages || []).slice(0, 2)
+    ];
     
     for (const message of messages) {
       // Process only if it has not been seen
@@ -105,6 +108,9 @@ async function pollRecentEmails() {
         const emailData = await extractEmailData(gmail, message.id);
         
         if (emailData) {
+          // Mark as spam if it has the SPAM label
+          emailData.isSpam = emailData.labelIds?.includes('SPAM');
+
           // Enrich with prediction and reasoning
           try {
             const prediction = await predict(emailData.body);

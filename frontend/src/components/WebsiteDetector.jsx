@@ -40,26 +40,28 @@ export default function WebsiteDetector() {
       }
 
       const data = await response.json();
+      const prediction = data.prediction || {};
+      const reasoning = data.reasoning || {};
       
       // Map backend response to frontend result structure
-      // Assuming backend returns { label: 'phishing', confidence: 0.9, ... }
       setResult({
         url: url,
-        isSuspicious: data.label?.toLowerCase() === 'phishing' || data.is_suspicious || (data.prediction?.toLowerCase() === 'spam'), // Adjust as per actual backend labels
-        riskScore: data.confidence ? (data.confidence * 100).toFixed(1) : (Math.random() * 100).toFixed(1),
-        threats: data.threats || (data.label?.toLowerCase() === 'phishing' ? ['Detected as phishing', 'Suspicious patterns found'] : ['No major threats detected']),
-        verdict: data.prediction || data.label || (Math.random() > 0.5 ? 'SUSPICIOUS' : 'SAFE')
+        isSuspicious: prediction.prediction?.toLowerCase() === 'phishing_email' || prediction.is_phishing,
+        riskScore: prediction.confidence ? (prediction.confidence * 100).toFixed(1) : '0',
+        threats: reasoning.indicators || (prediction.is_phishing ? ['Detected as phishing'] : ['No major threats detected']),
+        verdict: prediction.is_phishing || prediction.prediction?.toLowerCase() === 'phishing_email' ? 'PHISHING DETECTED' : (prediction.prediction === 'legitimate_email' ? 'SAFE' : prediction.prediction?.toUpperCase() || 'SAFE'),
+        reasoning: reasoning
       });
     } catch (err) {
       console.error('URL analysis error:', err);
-      setError('Failed to analyze URL. Using simulated result for demo.');
+      setError(`Analysis Error: ${err.message}. Showing simulated result for demo.`);
       
       // Fallback for demo
       setResult({
         url: url,
         isSuspicious: Math.random() > 0.5,
         riskScore: (Math.random() * 100).toFixed(1),
-        threats: ['Potential phishing', 'Suspicious domain'],
+        threats: ['Connectivity issue', 'Local analysis running'],
         verdict: Math.random() > 0.5 ? 'SUSPICIOUS' : 'SAFE'
       });
     } finally {
@@ -237,7 +239,31 @@ export default function WebsiteDetector() {
                     }`}>
                       {result.verdict}
                     </h4>
-                    {result.threats && result.threats.length > 0 && (
+                    
+                    {/* AI Reasoning Section */}
+                    {result.reasoning && (
+                      <div className="mt-4 space-y-4">
+                        {result.reasoning.explanation && (
+                          <div className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                            <p className="font-semibold mb-1">AI Explanation:</p>
+                            <p>{result.reasoning.explanation}</p>
+                          </div>
+                        )}
+                        
+                        {result.reasoning.recommended_steps && result.reasoning.recommended_steps.length > 0 && (
+                          <div className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                            <p className="font-semibold mb-1">Recommended Actions:</p>
+                            <ul className="list-disc list-inside space-y-1">
+                              {result.reasoning.recommended_steps.map((step, idx) => (
+                                <li key={idx}>{step}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {!result.reasoning && result.threats && result.threats.length > 0 && (
                       <div className={`text-sm space-y-1 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
                         <p className="font-semibold mb-2">Detected Issues:</p>
                         <ul className="list-disc list-inside">

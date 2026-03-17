@@ -49,10 +49,10 @@ export default function DeepFakeResult({ result, type = 'image' }) {
 
   return (
     <div className={`space-y-6 p-6 rounded-2xl border-2 transition-all duration-500 ${colorScheme.bgColor} ${colorScheme.borderColor}`}>
-      
+
       {/* Main Result Card */}
       <div className="flex gap-6 items-start">
-        
+
         {/* Circular Progress Indicator */}
         <div className="flex-shrink-0">
           <div className="relative w-32 h-32">
@@ -80,7 +80,7 @@ export default function DeepFakeResult({ result, type = 'image' }) {
                 className="transition-all duration-1000"
               />
             </svg>
-            
+
             {/* Center Text */}
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <div className={`text-3xl font-bold ${colorScheme.textColor}`}>
@@ -132,20 +132,17 @@ export default function DeepFakeResult({ result, type = 'image' }) {
       </div>
 
       {/* Analysis Metrics */}
-      <div className={`grid grid-cols-3 gap-4 p-4 rounded-xl ${
-        isDark ? 'bg-white/5' : 'bg-gray-100/50'
-      }`}>
-        
+      <div className={`grid grid-cols-3 gap-4 p-4 rounded-xl ${isDark ? 'bg-white/5' : 'bg-gray-100/50'
+        }`}>
+
         {/* Authenticity Score */}
         <div className="text-center">
-          <div className={`text-sm font-semibold uppercase tracking-wider mb-2 ${
-            isDark ? 'text-gray-400' : 'text-gray-600'
-          }`}>
+          <div className={`text-sm font-semibold uppercase tracking-wider mb-2 ${isDark ? 'text-gray-400' : 'text-gray-600'
+            }`}>
             Authenticity
           </div>
-          <div className={`text-2xl font-bold ${
-            !isDeepfake ? 'text-green-500' : 'text-gray-400'
-          }`}>
+          <div className={`text-2xl font-bold ${!isDeepfake ? 'text-green-500' : 'text-gray-400'
+            }`}>
             {isDeepfake ? (100 - parseFloat(confidencePercentage)).toFixed(1) : parseFloat(confidencePercentage).toFixed(1)}%
           </div>
           <div className={`text-xs mt-1 ${isDark ? 'text-gray-500' : 'text-gray-600'}`}>
@@ -157,14 +154,12 @@ export default function DeepFakeResult({ result, type = 'image' }) {
         <div className="text-center border-l border-r" style={{
           borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'
         }}>
-          <div className={`text-sm font-semibold uppercase tracking-wider mb-2 ${
-            isDark ? 'text-gray-400' : 'text-gray-600'
-          }`}>
+          <div className={`text-sm font-semibold uppercase tracking-wider mb-2 ${isDark ? 'text-gray-400' : 'text-gray-600'
+            }`}>
             Manipulation
           </div>
-          <div className={`text-2xl font-bold ${
-            isDeepfake ? 'text-red-500' : 'text-gray-400'
-          }`}>
+          <div className={`text-2xl font-bold ${isDeepfake ? 'text-red-500' : 'text-gray-400'
+            }`}>
             {isDeepfake ? parseFloat(confidencePercentage).toFixed(1) : (100 - parseFloat(confidencePercentage)).toFixed(1)}%
           </div>
           <div className={`text-xs mt-1 ${isDark ? 'text-gray-500' : 'text-gray-600'}`}>
@@ -174,14 +169,12 @@ export default function DeepFakeResult({ result, type = 'image' }) {
 
         {/* Confidence Level */}
         <div className="text-center">
-          <div className={`text-sm font-semibold uppercase tracking-wider mb-2 ${
-            isDark ? 'text-gray-400' : 'text-gray-600'
-          }`}>
+          <div className={`text-sm font-semibold uppercase tracking-wider mb-2 ${isDark ? 'text-gray-400' : 'text-gray-600'
+            }`}>
             Reliability
           </div>
-          <div className={`text-2xl font-bold ${
-            parseFloat(confidencePercentage) > 70 ? 'text-blue-500' : 'text-yellow-500'
-          }`}>
+          <div className={`text-2xl font-bold ${parseFloat(confidencePercentage) > 70 ? 'text-blue-500' : 'text-yellow-500'
+            }`}>
             {parseFloat(confidencePercentage) > 70 ? 'High' : 'Medium'}
           </div>
           <div className={`text-xs mt-1 ${isDark ? 'text-gray-500' : 'text-gray-600'}`}>
@@ -200,9 +193,8 @@ export default function DeepFakeResult({ result, type = 'image' }) {
             {confidencePercentage}%
           </p>
         </div>
-        <div className={`h-3 rounded-full overflow-hidden ${
-          isDark ? 'bg-white/10' : 'bg-gray-200'
-        }`}>
+        <div className={`h-3 rounded-full overflow-hidden ${isDark ? 'bg-white/10' : 'bg-gray-200'
+          }`}>
           <div
             className={`h-full transition-all duration-1000 bg-gradient-to-r ${colorScheme.accentColor}`}
             style={{ width: `${confidencePercentage}%` }}
@@ -211,20 +203,18 @@ export default function DeepFakeResult({ result, type = 'image' }) {
       </div>
 
       {/* Detailed Analysis Text */}
-      <div className={`p-4 rounded-lg border ${
-        isDark 
-          ? 'bg-white/5 border-white/10' 
+      <div className={`p-4 rounded-lg border ${isDark
+          ? 'bg-white/5 border-white/10'
           : 'bg-gray-50 border-gray-200'
-      }`}>
+        }`}>
         <div className="flex gap-3">
           <BarChart3 className={`w-5 h-5 flex-shrink-0 mt-0.5 ${colorScheme.textColor}`} />
           <div>
             <h4 className={`font-semibold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
               Analysis Details
             </h4>
-            <p className={`text-sm leading-relaxed ${
-              isDark ? 'text-gray-300' : 'text-gray-700'
-            }`}>
+            <p className={`text-sm leading-relaxed ${isDark ? 'text-gray-300' : 'text-gray-700'
+              }`}>
               {isDeepfake
                 ? `The analysis has detected signs of artificial manipulation or deepfake technology with ${confidencePercentage}% confidence. The media exhibits characteristics typical of AI-generated or heavily manipulated content. Extreme caution is recommended when sharing or relying on this media.`
                 : `The analysis indicates this media is likely authentic with ${confidencePercentage}% confidence. No significant signs of deepfake technology or artificial manipulation were detected. However, no analysis is 100% accurate, and extremely sophisticated deepfakes may still evade detection.`
@@ -235,25 +225,22 @@ export default function DeepFakeResult({ result, type = 'image' }) {
       </div>
 
       {/* Warning/Info Banner */}
-      <div className={`p-4 rounded-lg border ${
-        isDeepfake
+      <div className={`p-4 rounded-lg border ${isDeepfake
           ? isDark
             ? 'bg-red-500/10 border-red-500/30'
             : 'bg-red-50 border-red-300'
           : isDark
             ? 'bg-blue-500/10 border-blue-500/30'
             : 'bg-blue-50 border-blue-300'
-      }`}>
-        <p className={`text-sm font-semibold mb-1 ${
-          isDeepfake
+        }`}>
+        <p className={`text-sm font-semibold mb-1 ${isDeepfake
             ? colorScheme.textColor
             : isDark ? 'text-blue-400' : 'text-blue-600'
-        }`}>
+          }`}>
           {isDeepfake ? '⚠️ Important Notice' : 'ℹ️ For Your Information'}
         </p>
-        <p className={`text-sm leading-relaxed ${
-          isDark ? 'text-gray-300' : 'text-gray-700'
-        }`}>
+        <p className={`text-sm leading-relaxed ${isDark ? 'text-gray-300' : 'text-gray-700'
+          }`}>
           {isDeepfake
             ? 'Share this analysis responsibly. This media may have been digitally altered and should not be trusted without additional verification from reliable sources.'
             : 'While this media appears authentic, always verify important information through multiple reliable sources before making decisions based on it.'
@@ -263,16 +250,14 @@ export default function DeepFakeResult({ result, type = 'image' }) {
 
       {/* Action Buttons */}
       <div className="flex gap-3 pt-2">
-        <button className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-all duration-300 ${
-          isDark
+        <button className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-all duration-300 ${isDark
             ? 'bg-white/10 hover:bg-white/20 text-white'
             : 'bg-gray-200 hover:bg-gray-300 text-gray-900'
-        }`}>
+          }`}>
           Save Report
         </button>
-        <button className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-all duration-300 bg-gradient-to-r ${
-          colorScheme.accentColor
-        } text-white hover:shadow-lg hover:shadow-${isDeepfake ? 'red' : 'green'}-500/50`}>
+        <button className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-all duration-300 bg-gradient-to-r ${colorScheme.accentColor
+          } text-white hover:shadow-lg hover:shadow-${isDeepfake ? 'red' : 'green'}-500/50`}>
           Analyze Another
         </button>
       </div>
