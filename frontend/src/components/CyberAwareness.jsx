@@ -44,7 +44,8 @@ const CyberAwareness = () => {
         setError(null);
 
         // Fetch videos for each topic
-        const allVideos = await searchCyberSecurityVideos(cybersecurityTopics, 2);
+        // New optimized call (5 topics, 1 video each, no stats)
+        const allVideos = await searchCyberSecurityVideos(null, 1, false);
 
         // Remove duplicates based on videoId
         const uniqueVideos = Array.from(
