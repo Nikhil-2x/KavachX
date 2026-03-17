@@ -28,8 +28,8 @@ export default function GmailInbox({
 
   return (
     <section className={`relative min-h-screen overflow-hidden transition-colors duration-500 ${isDark
-        ? 'bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950'
-        : 'bg-gradient-to-br from-white via-gray-50 to-white'
+      ? 'bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950'
+      : 'bg-gradient-to-br from-white via-gray-50 to-white'
       }`}>
       {/* Animated Background Blobs - Dark Mode Only */}
       {isDark && (
@@ -60,13 +60,13 @@ export default function GmailInbox({
             }`}
         >
           <div className={`inline-flex items-center gap-2 px-4 py-2 backdrop-blur-md border rounded-full transition-all duration-300 cursor-pointer group ${isDark
-              ? 'bg-white/10 hover:bg-white/20 border-white/20 hover:border-white/40'
-              : 'bg-gray-100 hover:bg-gray-200 border-gray-300 hover:border-gray-400'
+            ? 'bg-white/10 hover:bg-white/20 border-white/20 hover:border-white/40'
+            : 'bg-gray-100 hover:bg-gray-200 border-gray-300 hover:border-gray-400'
             }`}>
             <Mail className={`w-4 h-4 animate-pulse ${isDark ? 'text-purple-300' : 'text-purple-600'}`} />
             <span className={`text-sm font-medium bg-clip-text text-transparent ${isDark
-                ? 'bg-gradient-to-r from-purple-200 to-pink-200'
-                : 'bg-gradient-to-r from-purple-600 to-pink-600'
+              ? 'bg-gradient-to-r from-purple-200 to-pink-200'
+              : 'bg-gradient-to-r from-purple-600 to-pink-600'
               }`}>
               Real-time Email Monitoring
             </span>
@@ -86,8 +86,8 @@ export default function GmailInbox({
                 <span className="absolute inset-0 blur-2xl bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 opacity-40 animate-pulse rounded-lg"></span>
               )}
               <span className={`relative bg-clip-text text-transparent drop-shadow-2xl transition-all duration-300 ${isDark
-                  ? 'bg-gradient-to-r from-purple-300 via-pink-300 to-blue-300 hover:from-purple-200 hover:via-pink-200 hover:to-blue-200'
-                  : 'bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 hover:from-purple-500 hover:via-pink-500 hover:to-blue-500'
+                ? 'bg-gradient-to-r from-purple-300 via-pink-300 to-blue-300 hover:from-purple-200 hover:via-pink-200 hover:to-blue-200'
+                : 'bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 hover:from-purple-500 hover:via-pink-500 hover:to-blue-500'
                 }`}>
                 Inbox Reimagined
               </span>
@@ -128,8 +128,8 @@ export default function GmailInbox({
               }`}
           >
             <div className={`p-5 backdrop-blur-md border rounded-2xl flex items-start gap-4 transition-all duration-300 ${isDark
-                ? 'bg-red-500/10 hover:bg-red-500/20 border-red-500/30 hover:border-red-500/50'
-                : 'bg-red-50 hover:bg-red-100 border-red-200 hover:border-red-300'
+              ? 'bg-red-500/10 hover:bg-red-500/20 border-red-500/30 hover:border-red-500/50'
+              : 'bg-red-50 hover:bg-red-100 border-red-200 hover:border-red-300'
               }`}>
               <AlertTriangle className={`w-6 h-6 flex-shrink-0 ${isDark ? 'text-red-400' : 'text-red-600'}`} />
               <div>
@@ -166,12 +166,12 @@ export default function GmailInbox({
                 }`}
             >
               <div className={`text-center max-w-lg p-10 rounded-3xl border backdrop-blur-lg transition-all duration-300 ${isDark
-                  ? 'bg-white/5 border-white/10 hover:border-purple-500/30'
-                  : 'bg-white border-gray-200 hover:border-purple-300 shadow-xl'
+                ? 'bg-white/5 border-white/10 hover:border-purple-500/30'
+                : 'bg-white border-gray-200 hover:border-purple-300 shadow-xl'
                 }`}>
                 <div className={`w-24 h-24 rounded-3xl flex items-center justify-center mx-auto mb-8 border transition-all duration-500 group ${isDark
-                    ? 'bg-purple-500/20 border-purple-500/30 group-hover:rotate-12'
-                    : 'bg-purple-50 border-purple-200 group-hover:rotate-12 shadow-inner'
+                  ? 'bg-purple-500/20 border-purple-500/30 group-hover:rotate-12'
+                  : 'bg-purple-50 border-purple-200 group-hover:rotate-12 shadow-inner'
                   }`}>
                   <Mail className={`w-12 h-12 transition-all duration-300 ${isDark ? 'text-purple-400' : 'text-purple-600'}`} />
                 </div>
@@ -193,8 +193,8 @@ export default function GmailInbox({
                 onClick={onRefresh}
                 disabled={loading}
                 className={`group relative px-6 py-4 font-bold rounded-xl backdrop-blur-md transition-all duration-300 hover:-translate-y-1 active:translate-y-0 disabled:opacity-50 flex items-center gap-3 border ${isDark
-                    ? 'bg-white/10 hover:bg-white/20 border-white/10 hover:border-purple-500/50 text-white'
-                    : 'bg-white hover:bg-gray-50 border-gray-200 hover:border-purple-400 text-gray-900 shadow-sm'
+                  ? 'bg-white/10 hover:bg-white/20 border-white/10 hover:border-purple-500/50 text-white'
+                  : 'bg-white hover:bg-gray-50 border-gray-200 hover:border-purple-400 text-gray-900 shadow-sm'
                   }`}
               >
                 <RefreshCw className={`w-5 h-5 transition-transform duration-700 ${loading ? 'animate-spin' : 'group-hover:rotate-180'}`} />
@@ -202,25 +202,10 @@ export default function GmailInbox({
               </button>
 
               <button
-                onClick={handleStartWatch}
-                className={`group relative px-6 py-4 font-bold rounded-xl backdrop-blur-md transition-all duration-300 hover:-translate-y-1 active:translate-y-0 flex items-center gap-3 border ${isWatching
-                    ? isDark
-                      ? 'bg-green-500/20 border-green-500/50 text-green-300 hover:bg-green-500/30'
-                      : 'bg-green-50 border-green-300 text-green-700 hover:bg-green-100'
-                    : isDark
-                      ? 'bg-white/10 hover:bg-white/20 border-white/10 hover:border-blue-500/50 text-white'
-                      : 'bg-white hover:bg-gray-50 border-gray-200 hover:border-blue-400 text-gray-900 shadow-sm'
-                  }`}
-              >
-                <span className={`w-2.5 h-2.5 rounded-full transition-all ${isWatching ? (isDark ? 'bg-green-400' : 'bg-green-600') + ' animate-pulse' : (isDark ? 'bg-slate-500' : 'bg-gray-400')}`}></span>
-                {isWatching ? 'Active Monitoring' : 'Start Watch'}
-              </button>
-
-              <button
                 onClick={onLogout}
                 className={`group relative px-6 py-4 font-bold rounded-xl backdrop-blur-md transition-all duration-300 hover:-translate-y-1 active:translate-y-0 flex items-center gap-3 border ${isDark
-                    ? 'bg-white/10 hover:bg-red-500/20 border-white/10 hover:border-red-500/50 text-white hover:text-red-300'
-                    : 'bg-white hover:bg-red-50 border-gray-200 hover:border-red-400 text-gray-900 hover:text-red-700 shadow-sm'
+                  ? 'bg-white/10 hover:bg-red-500/20 border-white/10 hover:border-red-500/50 text-white hover:text-red-300'
+                  : 'bg-white hover:bg-red-50 border-gray-200 hover:border-red-400 text-gray-900 hover:text-red-700 shadow-sm'
                   }`}
               >
                 <LogOut className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
@@ -239,8 +224,8 @@ export default function GmailInbox({
                     <div
                       key={i}
                       className={`h-32 rounded-2xl backdrop-blur-md animate-pulse border ${isDark
-                          ? 'bg-white/5 border-white/10'
-                          : 'bg-gray-100 border-gray-200'
+                        ? 'bg-white/5 border-white/10'
+                        : 'bg-gray-100 border-gray-200'
                         }`}
                     ></div>
                   ))}
@@ -248,8 +233,8 @@ export default function GmailInbox({
               ) : emails.length === 0 ? (
                 <div className="text-center py-24 bg-white/5 backdrop-blur-lg rounded-3xl border border-white/10 transition-all duration-500 hover:border-purple-500/20">
                   <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 border transition-all duration-500 group-hover:scale-110 ${isDark
-                      ? 'bg-white/5 border-white/10'
-                      : 'bg-gray-50 border-gray-200 shadow-inner'
+                    ? 'bg-white/5 border-white/10'
+                    : 'bg-gray-50 border-gray-200 shadow-inner'
                     }`}>
                     <Mail className={`w-10 h-10 ${isDark ? 'text-gray-400' : 'text-gray-600'}`} />
                   </div>
@@ -277,16 +262,20 @@ export default function GmailInbox({
                       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 translate-x-[-100%] group-hover:translate-x-[100%] pointer-events-none"></div>
 
                       <div className="relative space-y-4">
-                        <div className="flex items-start justify-between gap-4">
+                        <div className="flex items-center gap-2 mb-1">
                           <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-3 mb-3">
+                            <div className="flex items-center gap-2 mb-1">
+                              {email.isSpam && (
+                                <span className="text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider bg-orange-500/20 text-orange-400 border border-orange-500/30">
+                                  Spam
+                                </span>
+                              )}
                               {email.prediction && (
-                                <span className={`text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-widest flex items-center gap-1.5 ${email.prediction.label?.toLowerCase() === 'spam' || email.prediction.is_threat
-                                    ? 'bg-red-500/20 text-red-400 border border-red-500/30'
-                                    : 'bg-green-500/20 text-green-400 border border-green-500/30'
+                                <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${email.prediction.prediction?.toLowerCase() === 'phishing_email' || email.prediction.is_phishing
+                                  ? 'bg-red-500/20 text-red-400 border border-red-500/30'
+                                  : 'bg-green-500/20 text-green-400 border border-green-500/30'
                                   }`}>
-                                  {email.prediction.label?.toLowerCase() === 'spam' || email.prediction.is_threat ? <AlertTriangle className="w-3 h-3" /> : <Shield className="w-3 h-3" />}
-                                  {email.prediction.label || 'Clean'}
+                                  {email.prediction.is_phishing ? 'Phishing' : (email.prediction.prediction === 'legitimate_email' ? 'Clean' : email.prediction.prediction || 'Clean')}
                                 </span>
                               )}
                               {email.prediction && (
@@ -428,4 +417,4 @@ export default function GmailInbox({
       `}</style>
     </section>
   );
-}
+}

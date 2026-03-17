@@ -1,4 +1,5 @@
 // server/index.js - UPDATED VERSION
+console.log('Server file is being executed...');
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -10,7 +11,7 @@ import { initSocket } from './socket/socketServer.js';
 import gmailRoutes from './routes/gmailRoutes.js';
 import urlRoute from './routes/urlRoute.js';
 import imageRoutes from './routes/imageRoutes.js';
-import youtubeRoutes from './routes/youtubeRoutes.js'; // ADD THIS LINE
+import youtubeRoutes from './routes/youtubeRoutes.js';
 
 const app = express();
 const server = http.createServer(app);
@@ -26,20 +27,16 @@ app.use(express.json());
 app.use('/', gmailRoutes);
 app.use('/', urlRoute);
 app.use('/', imageRoutes);
-app.use('/youtube', youtubeRoutes); // ADD THIS LINE
+app.use('/youtube', youtubeRoutes);
 
 // Environment variables
 const PORT = process.env.PORT || 3000;
 
-// Export app and server for pluggability into existing systems
+// Start Server - Directly for now to ensure it starts
+server.listen(PORT, () => {
+  console.log(`🚀 Server started successfully on port ${PORT}`);
+  console.log(`🔗 Local status check: http://localhost:${PORT}/auth/status`);
+});
+
+// Export app and server
 export { app, server };
-
-// Start Server conditionally if this is the main module
-const isMainModule = url.fileURLToPath(import.meta.url) === process.argv[1];
-
-if (isMainModule) {
-  server.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-    console.log(`OAuth Redirect URI should be: http://localhost:${PORT}/auth/google/callback`);
-  });
-}

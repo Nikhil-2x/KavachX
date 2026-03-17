@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import Features from './components/Features';
@@ -129,7 +129,7 @@ export default function App() {
       />
 
       <main>
-        {activeTab === 'home' && <Hero />}
+        {activeTab === 'home' && <Hero setActiveTab={setActiveTab} />}
 
         {activeTab === 'inbox' && (
           <GmailInbox
