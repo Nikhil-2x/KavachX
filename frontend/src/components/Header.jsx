@@ -9,8 +9,8 @@ export default function Header({ activeTab, setActiveTab, isAuthenticated, user,
 
   const tabs = [
     { id: 'home', label: 'Home' },
-    { id: 'features', label: 'Features' },
     { id: 'about', label: 'About' },
+    { id: 'features', label: 'Features' },
     ...(isAuthenticated ? [{ id: 'inbox', label: 'Inbox' }] : []),
     { id: 'deepfake', label: 'Deep Fake' },
     { id: 'cyberawareness', label: 'Cyber Awareness' },
