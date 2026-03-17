@@ -1,3 +1,4 @@
+// src/components/Header.jsx - UPDATED WITH DEEPFAKE TAB
 import React, { useState } from 'react';
 import { LogOut, Menu, X, Moon, Sun } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
@@ -11,6 +12,7 @@ export default function Header({ activeTab, setActiveTab, isAuthenticated, user,
     { id: 'features', label: 'Features' },
     { id: 'about', label: 'About' },
     ...(isAuthenticated ? [{ id: 'inbox', label: 'Inbox' }] : []),
+    { id: 'deepfake', label: 'Deep Fake' },
     { id: 'cyberawareness', label: 'Cyber Awareness' },
   ];
 
