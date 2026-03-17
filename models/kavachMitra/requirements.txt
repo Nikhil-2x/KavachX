@@ -5,3 +5,5 @@ langchain-classic
 langchain-community
 langchain-groq
 groq
+fastapi
+uvicorn

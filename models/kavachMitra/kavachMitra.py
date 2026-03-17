@@ -3,6 +3,11 @@ import json
 import sys
 from typing import Dict
 
+from fastapi import FastAPI
+from pydantic import BaseModel
+# FastAPI app
+app = FastAPI(title="KavachMitra API")
+
 print("Python being used:", sys.executable)
 
 from dotenv import load_dotenv
@@ -95,6 +100,24 @@ def kavach_mitra_agent(llm, user_query: str) -> Dict:
             "note": "Model output was not valid JSON"
         }
 
+class ChatRequest(BaseModel):
+    message: str
+
+# Load environment and configure model once for API
+_load_env()
+llm = _configure_model()
+
+@app.get("/")
+def health_check():
+    return {"status": "KavachMitra API running"}
+
+
+@app.post("/chat")
+def chat_endpoint(req: ChatRequest):
+
+    result = kavach_mitra_agent(llm, req.message)
+
+    return result
 
 def main():
 
