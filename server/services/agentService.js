@@ -51,22 +51,19 @@ function _configureModel() {
 export async function analyzeEmail(emailSubject, emailBody, classification) {
   const llm = _configureModel();
 
-  const systemPrompt = `You are a cybersecurity analyst assistant.
+  // Truncate email body to avoid 413 "Request too large" errors
+  const MAX_CHARACTERS = 5000;
+  const truncatedBody = emailBody && emailBody.length > MAX_CHARACTERS 
+    ? emailBody.substring(0, MAX_CHARACTERS) + '... [Truncated for brevity]' 
+    : emailBody;
 
-Return output as valid JSON with keys:
-- explanation
-- indicators
-- recommended_steps
-- resources
+  const systemPrompt = `Analyze email for security:
+- Output valid JSON: {explanation, indicators, recommended_steps, resources}
+- Be precise and concise. No markdown.`;
 
-Do NOT include markdown.`;
-
-  const userPrompt = `Email Subject: ${emailSubject}
-
-Email Body:
-${emailBody}
-
-Classification: ${classification}`;
+  const userPrompt = `Subject: ${emailSubject}
+Body: ${truncatedBody}
+Class: ${classification}`;
 
   const messages = [
     { _getType: () => 'system', content: systemPrompt },
@@ -87,6 +84,17 @@ Classification: ${classification}`;
     }
   } catch (error) {
     console.error('Error calling Groq API:', error.message);
+    
+    // Graceful handling for rate limits
+    if (error.message.includes('rate_limit_exceeded') || error.status === 429) {
+      return {
+        explanation: 'Detailed analysis currently unavailable due to high system load.',
+        indicators: ['Rate limit reached'],
+        recommended_steps: ['Try again shortly'],
+        note: 'Groq API Rate Limit Reached'
+      };
+    }
+
     return {
       error: error.message,
       explanation: 'Failed to analyze email due to API error',
@@ -103,24 +111,18 @@ Classification: ${classification}`;
 export async function reasonAboutPrediction(emailBody, predictionResult) {
   const llm = _configureModel();
 
-  const systemPrompt = `You are a cybersecurity analyst assistant. 
-You will analyze email prediction results and provide reasoning.
+  // Truncate email body to avoid 413 "Request too large" errors
+  const MAX_CHARACTERS = 5000;
+  const truncatedBody = emailBody && emailBody.length > MAX_CHARACTERS 
+    ? emailBody.substring(0, MAX_CHARACTERS) + '... [Truncated for brevity]' 
+    : emailBody;
 
-Return output as valid JSON with keys:
-- explanation
-- indicators
-- recommended_steps
-- resources
+  const systemPrompt = `Explain security prediction:
+- Output valid JSON: {explanation, indicators, recommended_steps, resources}
+- No markdown. Keep it focused.`;
 
-Do NOT include markdown.`;
-
-  const userPrompt = `Email Body:
-${emailBody}
-
-Prediction Result:
-${JSON.stringify(predictionResult, null, 2)}
-
-Provide detailed reasoning about this prediction result.`;
+  const userPrompt = `Body: ${truncatedBody}
+Result: ${JSON.stringify(predictionResult)}`;
 
   const messages = [
     { _getType: () => 'system', content: systemPrompt },
@@ -141,9 +143,20 @@ Provide detailed reasoning about this prediction result.`;
     }
   } catch (error) {
     console.error('Error calling Groq API:', error.message);
+    
+    // Graceful handling for rate limits
+    if (error.message.includes('rate_limit_exceeded') || error.status === 429) {
+      return {
+        explanation: 'Detailed analysis currently unavailable due to high system load.',
+        indicators: ['Rate limit reached'],
+        recommended_steps: ['Refresh later for detailed analysis'],
+        note: 'Groq API Rate Limit Reached'
+      };
+    }
+
     return {
       error: error.message,
-      reasoning: 'Failed to get reasoning due to API error',
+      explanation: 'Failed to get reasoning due to API error',
     };
   }
 }

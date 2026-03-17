@@ -63,6 +63,7 @@ export async function extractEmailData(gmail, messageId) {
       from,
       snippet,
       body,
+      labelIds: msg.labelIds || [],
       timestamp: new Date().toISOString()
     };
   } catch (error) {
