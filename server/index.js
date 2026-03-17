@@ -8,6 +8,8 @@ import http from 'http';
 import * as url from 'url';
 import { initSocket } from './socket/socketServer.js';
 import gmailRoutes from './routes/gmailRoutes.js';
+import urlRoute from './routes/urlRoute.js';
+import imageRoutes from './routes/imageRoutes.js';
 import youtubeRoutes from './routes/youtubeRoutes.js'; // ADD THIS LINE
 
 const app = express();
@@ -22,6 +24,8 @@ app.use(express.json());
 
 // Routes
 app.use('/', gmailRoutes);
+app.use('/', urlRoute);
+app.use('/', imageRoutes);
 app.use('/youtube', youtubeRoutes); // ADD THIS LINE
 
 // Environment variables
