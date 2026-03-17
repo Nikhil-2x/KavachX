@@ -1,12 +1,15 @@
 import os
 import json
-from typing import Dict
 import sys
+from typing import Dict
 
 print("Python being used:", sys.executable)
 
 from dotenv import load_dotenv
 from langchain_groq import ChatGroq
+# from langchain.memory import ConversationBufferMemory
+# from langchain_community.memory import ConversationBufferMemory
+from langchain_classic.memory import ConversationBufferMemory
 from langchain_core.messages import SystemMessage, HumanMessage
 
 
@@ -31,11 +34,11 @@ def _configure_model():
     return llm
 
 
-def kavach_mitra_agent(user_query: str) -> Dict:
+# Initialize memory (stores conversation history)
+memory = ConversationBufferMemory(return_messages=True)
 
-    llm = _configure_model()
 
-    system_prompt = """
+system_prompt = """
 You are KavachMitra, the official AI cybersecurity assistant for the KavachX platform developed by team BItWin Init.
 
 Your role:
@@ -57,19 +60,32 @@ Return output strictly in JSON with the following keys:
 - prevention_tips
 - resources
 
-If the question is outside the scope of cybersecurity, return a JSON with all values containing the above message.
+If the question is outside cybersecurity scope, return JSON with all values containing the above message.
 
 Do NOT include markdown.
 """
 
-    messages = [
-        SystemMessage(content=system_prompt),
-        HumanMessage(content=user_query)
-    ]
+
+def kavach_mitra_agent(llm, user_query: str) -> Dict:
+
+    # Get previous conversation
+    history = memory.load_memory_variables({})["history"]
+
+    messages = [SystemMessage(content=system_prompt)]
+
+    # Add previous chat history
+    messages.extend(history)
+
+    # Add new question
+    messages.append(HumanMessage(content=user_query))
 
     response = llm.invoke(messages)
 
     text = response.content.strip()
+
+    # Save conversation into memory
+    memory.chat_memory.add_user_message(user_query)
+    memory.chat_memory.add_ai_message(text)
 
     try:
         return json.loads(text)
@@ -82,12 +98,24 @@ Do NOT include markdown.
 
 def main():
 
-    user_question = input("Ask KavachMitra: ")
+    llm = _configure_model()
 
-    result = kavach_mitra_agent(user_question)
+    print("\nKavachMitra Cybersecurity Assistant")
+    print("Type 'exit' to stop\n")
 
-    print("\n=== KavachMitra Response ===")
-    print(json.dumps(result, indent=2))
+    while True:
+
+        user_question = input("Ask KavachMitra: ")
+
+        if user_question.lower() in ["exit", "quit"]:
+            print("Goodbye from KavachMitra.")
+            break
+
+        result = kavach_mitra_agent(llm, user_question)
+
+        print("\n=== KavachMitra Response ===")
+        print(json.dumps(result, indent=2))
+        print()
 
 
 if __name__ == "__main__":
