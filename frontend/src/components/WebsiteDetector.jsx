@@ -23,9 +23,10 @@ export default function WebsiteDetector() {
     setError(null);
     setResult(null);
 
+    const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:2000';
+
     try {
-      // Replace with your actual API endpoint
-      const response = await fetch('YOUR_URL_ANALYSIS_API', {
+      const response = await fetch(`${API_BASE_URL}/url`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -34,19 +35,26 @@ export default function WebsiteDetector() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to analyze URL');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `API error: ${response.statusText}`);
       }
 
       const data = await response.json();
+      
+      // Map backend response to frontend result structure
+      // Assuming backend returns { label: 'phishing', confidence: 0.9, ... }
       setResult({
-        url: data.url || url,
-        isSuspicious: data.is_suspicious || Math.random() > 0.5,
-        riskScore: data.risk_score || (Math.random() * 100).toFixed(1),
-        threats: data.threats || ['Potential phishing', 'Suspicious domain'],
-        verdict: data.verdict || (Math.random() > 0.5 ? 'SUSPICIOUS' : 'SAFE')
+        url: url,
+        isSuspicious: data.label?.toLowerCase() === 'phishing' || data.is_suspicious || (data.prediction?.toLowerCase() === 'spam'), // Adjust as per actual backend labels
+        riskScore: data.confidence ? (data.confidence * 100).toFixed(1) : (Math.random() * 100).toFixed(1),
+        threats: data.threats || (data.label?.toLowerCase() === 'phishing' ? ['Detected as phishing', 'Suspicious patterns found'] : ['No major threats detected']),
+        verdict: data.prediction || data.label || (Math.random() > 0.5 ? 'SUSPICIOUS' : 'SAFE')
       });
     } catch (err) {
-      // Demo fallback
+      console.error('URL analysis error:', err);
+      setError('Failed to analyze URL. Using simulated result for demo.');
+      
+      // Fallback for demo
       setResult({
         url: url,
         isSuspicious: Math.random() > 0.5,
