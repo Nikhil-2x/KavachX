@@ -1,4 +1,5 @@
 import { Telegraf, Markup } from "telegraf";
+import fs from "fs";
 
 const bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
 const reasoningByEmailId = new Map();
@@ -87,7 +88,13 @@ export function launchBot() {
 }
 
 // 🔥 NEW FUNCTION (REPLACES YOUR OLD ONE)
-export async function sendTelegramAlert(emailData, prediction, reasoning) {
+export async function sendTelegramAlert(
+  emailData,
+  prediction,
+  reasoning,
+  screenshotPath,
+  screenshotStatus,
+) {
   const chatId = process.env.TELEGRAM_CHAT_ID;
 
   if (!chatId) {
@@ -97,22 +104,75 @@ export async function sendTelegramAlert(emailData, prediction, reasoning) {
 
   reasoningByEmailId.set(emailData.id, reasoning);
 
-  await bot.telegram.sendMessage(
-    chatId,
-    `🚨 *Phishing Email Detected!*
+  //   await bot.telegram.sendMessage(
+  //     chatId,
+  //     `🚨 *Phishing Email Detected!*
+
+  // 📧 *From:* ${emailData.from}
+  // 📝 *Subject:* ${emailData.subject}
+  // ⚠️ *Confidence:* ${(prediction.confidence * 100).toFixed(2)}%`,
+  //     {
+  //       parse_mode: "Markdown",
+  //       ...Markup.inlineKeyboard([
+  //         [
+  //           Markup.button.callback("✅ Safe", `SAFE_${emailData.id}`),
+  //           Markup.button.callback("🚫 Block", `BLOCK_${emailData.id}`),
+  //         ],
+  //         [Markup.button.callback("📖 Why?", `WHY_${emailData.id}`)],
+  //       ]),
+  //     },
+  //   );
+  let extraMessage = "";
+
+  if (screenshotStatus === "invalid_domain") {
+    extraMessage =
+      "\n🚫 Domain does NOT exist → highly suspicious phishing link";
+  } else if (screenshotStatus === "failed") {
+    extraMessage = "\n⚠️ Could not load the website safely";
+  } else if (screenshotStatus === "success") {
+    extraMessage = "\n📸 Screenshot attached";
+  }
+
+  const caption = `🚨 *Phishing Email Detected!*
 
 📧 *From:* ${emailData.from}
 📝 *Subject:* ${emailData.subject}
-⚠️ *Confidence:* ${(prediction.confidence * 100).toFixed(2)}%`,
-    {
-      parse_mode: "Markdown",
-      ...Markup.inlineKeyboard([
-        [
-          Markup.button.callback("✅ Safe", `SAFE_${emailData.id}`),
-          Markup.button.callback("🚫 Block", `BLOCK_${emailData.id}`),
-        ],
-        [Markup.button.callback("📖 Why?", `WHY_${emailData.id}`)],
-      ]),
-    },
-  );
+⚠️ *Confidence:* ${(prediction.confidence * 100).toFixed(2)}%
+
+${extraMessage}`;
+
+  const inlineKeyboard = Markup.inlineKeyboard([
+    [
+      Markup.button.callback("✅ Safe", `SAFE_${emailData.id}`),
+      Markup.button.callback("🚫 Block", `BLOCK_${emailData.id}`),
+    ],
+    [Markup.button.callback("📖 Why?", `WHY_${emailData.id}`)],
+  ]);
+
+  try {
+    if (screenshotPath && fs.existsSync(screenshotPath)) {
+      await bot.telegram.sendPhoto(
+        chatId,
+        {
+          source: screenshotPath,
+        },
+        {
+          caption,
+          parse_mode: "Markdown",
+          ...inlineKeyboard,
+        },
+      );
+
+      // 🧹 DELETE AFTER SEND
+      fs.unlinkSync(screenshotPath);
+    } else {
+      // fallback (no screenshot)
+      await bot.telegram.sendMessage(chatId, caption, {
+        parse_mode: "Markdown",
+        ...inlineKeyboard,
+      });
+    }
+  } catch (err) {
+    console.error("Telegram send error:", err.message);
+  }
 }

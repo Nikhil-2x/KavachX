@@ -5,6 +5,8 @@ import { extractEmailData } from "../utils/emailParser.js";
 import { predict } from "./predictService.js";
 import { reasonAboutPrediction } from "./agentService.js";
 import { sendTelegramAlert } from "./telegramService.js";
+import { extractUrls } from "../utils/extractJson.js";
+import { captureScreenshot } from "./screenshotService.js";
 
 // State to track processed messages and polling intervals
 class GmailServiceState {
@@ -138,10 +140,35 @@ async function pollRecentEmails() {
                 emailData.body,
                 prediction,
               );
-              console.log(reasoning);
+              // console.log(reasoning);
 
               emailData.reasoning = reasoning;
-              await sendTelegramAlert(emailData, prediction, reasoning);
+
+              const URLs = extractUrls(emailData.body);
+
+              let screenshotPath = null;
+              let screenshotStatus = null;
+
+              if (URLs.length > 0 && URLs[0]?.startsWith("http")) {
+                console.log("URL found, capturing screenshot...");
+
+                // screenshotPath = await captureScreenshot(URLs[0], emailData.id);
+                const result = await captureScreenshot(URLs[0], emailData.id);
+
+                screenshotStatus = result.status;
+
+                if (result.status === "success") {
+                  screenshotPath = result.path;
+                }
+              }
+
+              await sendTelegramAlert(
+                emailData,
+                prediction,
+                reasoning,
+                screenshotPath,
+                screenshotStatus,
+              );
             } else {
               emailData.reasoning = null;
             }

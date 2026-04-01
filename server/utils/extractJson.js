@@ -22,3 +22,10 @@ export default function extractJSON(text) {
 
   return null;
 }
+
+export function extractUrls(text) {
+  if (!text) return [];
+
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+  return text.match(urlRegex) || [];
+}
