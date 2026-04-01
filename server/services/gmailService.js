@@ -1,9 +1,10 @@
-import { google } from 'googleapis';
-import { oauth2Client } from '../config/googleOAuth.js';
-import { getIo } from '../socket/socketServer.js';
-import { extractEmailData } from '../utils/emailParser.js';
-import { predict } from './predictService.js';
-import { reasonAboutPrediction } from './agentService.js';
+import { google } from "googleapis";
+import { oauth2Client } from "../config/googleOAuth.js";
+import { getIo } from "../socket/socketServer.js";
+import { extractEmailData } from "../utils/emailParser.js";
+import { predict } from "./predictService.js";
+import { reasonAboutPrediction } from "./agentService.js";
+import { sendTelegramAlert } from "./telegramService.js";
 
 // State to track processed messages and polling intervals
 class GmailServiceState {
@@ -18,18 +19,18 @@ const state = new GmailServiceState();
 
 export async function getLatestEmails() {
   try {
-    const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
-    
+    const gmail = google.gmail({ version: "v1", auth: oauth2Client });
+
     // Fetch latest messages from INBOX and SPAM
     const inboxResponse = await gmail.users.messages.list({
-      userId: 'me',
-      labelIds: ['INBOX'],
+      userId: "me",
+      labelIds: ["INBOX"],
       maxResults: 10,
     });
 
     const spamResponse = await gmail.users.messages.list({
-      userId: 'me',
-      labelIds: ['SPAM'],
+      userId: "me",
+      labelIds: ["SPAM"],
       maxResults: 5, // Fetch fewer from spam to keep initial load fast
     });
 
@@ -37,28 +38,43 @@ export async function getLatestEmails() {
     const spamMessages = (spamResponse.data.messages || []).slice(0, 2);
 
     const messages = [...inboxMessages, ...spamMessages];
-    
+
     const extractedEmails = [];
 
     for (const message of messages) {
       // Add a small delay between processing emails to stagger load on Groq API
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await new Promise((resolve) => setTimeout(resolve, 1500));
 
       const emailData = await extractEmailData(gmail, message.id);
       if (emailData) {
         state.processedMessages.add(message.id);
-        
+
         // Mark as spam if it has the SPAM label
-        emailData.isSpam = emailData.labelIds?.includes('SPAM');
-        
+        emailData.isSpam = emailData.labelIds?.includes("SPAM");
+
         // Enrich with prediction and reasoning
         try {
           const prediction = await predict(emailData.body);
-          const reasoning = await reasonAboutPrediction(emailData.body, prediction);
+
           emailData.prediction = prediction;
-          emailData.reasoning = reasoning;
+
+          if (prediction?.is_phishing) {
+            const reasoning = await reasonAboutPrediction(
+              emailData.body,
+              prediction,
+            );
+            console.log(reasoning);
+
+            emailData.reasoning = reasoning;
+            await sendTelegramAlert(emailData, prediction, reasoning);
+          } else {
+            emailData.reasoning = null;
+          }
         } catch (enrichError) {
-          console.error(`Error enriching email ${message.id}:`, enrichError.message);
+          console.error(
+            `Error enriching email ${message.id}:`,
+            enrichError.message,
+          );
           emailData.prediction = null;
           emailData.reasoning = null;
         }
@@ -69,7 +85,7 @@ export async function getLatestEmails() {
 
     return extractedEmails;
   } catch (error) {
-    console.error('Error fetching latest emails:', error.message);
+    console.error("Error fetching latest emails:", error.message);
     throw error;
   }
 }
@@ -79,46 +95,61 @@ async function pollRecentEmails() {
   state.isFetching = true;
 
   try {
-    const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
-    
+    const gmail = google.gmail({ version: "v1", auth: oauth2Client });
+
     // Check for recent ones in INBOX and SPAM
     const inboxResponse = await gmail.users.messages.list({
-      userId: 'me',
-      labelIds: ['INBOX'],
+      userId: "me",
+      labelIds: ["INBOX"],
       maxResults: 5,
     });
 
     const spamResponse = await gmail.users.messages.list({
-      userId: 'me',
-      labelIds: ['SPAM'],
+      userId: "me",
+      labelIds: ["SPAM"],
       maxResults: 5,
     });
 
     const messages = [
       ...(inboxResponse.data.messages || []).slice(0, 3),
-      ...(spamResponse.data.messages || []).slice(0, 2)
+      ...(spamResponse.data.messages || []).slice(0, 2),
     ];
-    
+
     for (const message of messages) {
       // Process only if it has not been seen
       if (!state.processedMessages.has(message.id)) {
         // Add a small delay between processing emails to stagger load on Groq API
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+
         const emailData = await extractEmailData(gmail, message.id);
-        
+
         if (emailData) {
           // Mark as spam if it has the SPAM label
-          emailData.isSpam = emailData.labelIds?.includes('SPAM');
+          emailData.isSpam = emailData.labelIds?.includes("SPAM");
 
           // Enrich with prediction and reasoning
           try {
             const prediction = await predict(emailData.body);
-            const reasoning = await reasonAboutPrediction(emailData.body, prediction);
+
             emailData.prediction = prediction;
-            emailData.reasoning = reasoning;
+
+            if (prediction?.is_phishing) {
+              const reasoning = await reasonAboutPrediction(
+                emailData.body,
+                prediction,
+              );
+              console.log(reasoning);
+
+              emailData.reasoning = reasoning;
+              await sendTelegramAlert(emailData, prediction, reasoning);
+            } else {
+              emailData.reasoning = null;
+            }
           } catch (enrichError) {
-            console.error(`Error enriching polled email ${message.id}:`, enrichError.message);
+            console.error(
+              `Error enriching polled email ${message.id}:`,
+              enrichError.message,
+            );
             emailData.prediction = null;
             emailData.reasoning = null;
           }
@@ -130,21 +161,21 @@ async function pollRecentEmails() {
             body: emailData.body,
             timestamp: emailData.timestamp,
             prediction: emailData.prediction,
-            reasoning: emailData.reasoning
+            reasoning: emailData.reasoning,
           };
-          
-          console.log(JSON.stringify(logEntry, null, 2));
+
+          // console.log(JSON.stringify(logEntry, null, 2));
 
           // Emit real-time event
-          getIo().emit('new-email', emailData);
-          
+          getIo().emit("new-email", emailData);
+
           // Mark as processed
           state.processedMessages.add(message.id);
         }
       }
     }
   } catch (error) {
-    console.error('Error during email polling:', error.message);
+    console.error("Error during email polling:", error.message);
   } finally {
     state.isFetching = false;
   }
@@ -155,24 +186,24 @@ async function pollRecentEmails() {
  */
 export function startWatch() {
   if (state.pollingInterval) {
-    console.log('Polling is already running.');
-    return { status: 'already_running' };
+    console.log("Polling is already running.");
+    return { status: "already_running" };
   }
 
-  console.log('Starting email polling every 20 seconds...');
-  
+  console.log("Starting email polling every 20 seconds...");
+
   // Set interval for 20 seconds
   state.pollingInterval = setInterval(pollRecentEmails, 20 * 1000);
 
-  return { status: 'started' };
+  return { status: "started" };
 }
 
 export function stopWatch() {
   if (state.pollingInterval) {
     clearInterval(state.pollingInterval);
     state.pollingInterval = null;
-    console.log('Stopped email polling.');
-    return { status: 'stopped' };
+    console.log("Stopped email polling.");
+    return { status: "stopped" };
   }
-  return { status: 'not_running' };
+  return { status: "not_running" };
 }

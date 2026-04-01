@@ -1,17 +1,20 @@
 // server/index.js - UPDATED VERSION
-console.log('Server file is being executed...');
-import dotenv from 'dotenv';
+console.log("Server file is being executed...");
+import dotenv from "dotenv";
 dotenv.config();
 
-import express from 'express';
-import cors from 'cors';
-import http from 'http';
-import * as url from 'url';
-import { initSocket } from './socket/socketServer.js';
-import gmailRoutes from './routes/gmailRoutes.js';
-import urlRoute from './routes/urlRoute.js';
-import imageRoutes from './routes/imageRoutes.js';
-import youtubeRoutes from './routes/youtubeRoutes.js';
+import express from "express";
+import cors from "cors";
+import http from "http";
+import * as url from "url";
+import { initSocket } from "./socket/socketServer.js";
+import gmailRoutes from "./routes/gmailRoutes.js";
+import urlRoute from "./routes/urlRoute.js";
+import imageRoutes from "./routes/imageRoutes.js";
+import youtubeRoutes from "./routes/youtubeRoutes.js";
+import { launchBot } from "./services/telegramService.js";
+
+launchBot();
 
 const app = express();
 const server = http.createServer(app);
@@ -24,10 +27,10 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-app.use('/', gmailRoutes);
-app.use('/', urlRoute);
-app.use('/', imageRoutes);
-app.use('/youtube', youtubeRoutes);
+app.use("/", gmailRoutes);
+app.use("/", urlRoute);
+app.use("/", imageRoutes);
+app.use("/youtube", youtubeRoutes);
 
 // Environment variables
 const PORT = process.env.PORT || 3000;
