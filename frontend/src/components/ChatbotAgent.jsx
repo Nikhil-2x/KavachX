@@ -17,6 +17,8 @@ export default function ChatbotAgent() {
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
 
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:2000';
+
   // Auto-scroll to bottom when new messages arrive
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -28,49 +30,86 @@ export default function ChatbotAgent() {
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
-    
+
     if (!inputValue.trim()) return;
 
-    // Add user message
     const userMessage = {
-      id: messages.length + 1,
+      id: Date.now(),
       type: 'user',
       text: inputValue,
       timestamp: new Date()
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    setMessages((prev) => [...prev, userMessage]);
     setInputValue('');
     setIsLoading(true);
 
-    // Simulate bot response delay
-    setTimeout(() => {
-      const botResponses = [
-        "That's a great question! Let me help you with that. Check out our phishing detection tool to analyze suspicious emails.",
-        "Security is our top priority! I recommend using our Website Detector to verify URLs before clicking on them.",
-        "Smart thinking! Our Threat Similarity Engine can help you understand attack patterns and stay ahead of threats.",
-        "I can help with that! Would you like me to guide you through our features or answer specific security questions?",
-        "Excellent point! Here are some tips: Always verify URLs, use strong passwords, and enable two-factor authentication.",
-        "That's important. Our deep fake detector can help identify manipulated media. Try analyzing suspicious videos or images.",
-        "Great idea! Check out our Cyber Awareness section with educational videos on security best practices."
-      ];
+    try {
+      const response = await fetch(`${backendUrl}/chatbot-ui`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: inputValue })
+      });
 
-      const randomResponse = botResponses[Math.floor(Math.random() * botResponses.length)];
-      
+      const data = await response.json();
+
+      let botText;
+
+      if (data.error) {
+        botText = `Error: ${data.error}`;
+      } else if (data.topic && data.explanation) {
+        const tips = Array.isArray(data.prevention_tips) ? data.prevention_tips.map((tip) => `- ${tip}`).join('\n') : data.prevention_tips;
+        const resources = Array.isArray(data.resources) ? data.resources.map((r) => `- ${r}`).join('\n') : data.resources;
+
+        botText = `Topic: ${data.topic}\n\nExplanation: ${data.explanation}\n\nPrevention Tips:\n${tips}\n\nResources:\n${resources}`;
+      } else {
+        botText = data.raw || data.explanation || "I'm sorry, I couldn't understand that. Please ask a cybersecurity question.";
+      }
+
       const botMessage = {
-        id: messages.length + 2,
+        id: Date.now() + 1,
         type: 'bot',
-        text: randomResponse,
+        text: botText,
         timestamp: new Date()
       };
 
-      setMessages(prev => [...prev, botMessage]);
+      setMessages((prev) => [...prev, botMessage]);
+    } catch (err) {
+      const errorMessage = {
+        id: Date.now() + 2,
+        type: 'bot',
+        text: 'Something went wrong contacting the chatbot server. Please try again.',
+        timestamp: new Date()
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+      console.error('Chatbot fetch error', err);
+    } finally {
       setIsLoading(false);
-    }, 800);
+    }
   };
 
   const formatTime = (date) => {
     return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+  };
+
+  const renderFormattedMessage = (text) => {
+    const escaped = text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+
+    const withHeaders = escaped
+      .replace(/^topic:\s*/gim, '<strong class="text-purple-600 text-base">Topic:</strong> ')
+      .replace(/^explanation:\s*/gim, '<strong class="text-purple-600 text-base">Explanation:</strong> ')
+      .replace(/^prevention tips:\s*/gim, '<strong class="text-purple-600 text-base">Prevention Tips:</strong> ')
+      .replace(/^resources:\s*/gim, '<strong class="text-purple-600 text-base">Resources:</strong> ');
+
+    const html = withHeaders
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      .replace(/\n/g, '<br />');
+
+    return <div className="whitespace-pre-wrap text-sm leading-relaxed" dangerouslySetInnerHTML={{ __html: html }} />;
   };
 
   return (
@@ -153,7 +192,11 @@ export default function ChatbotAgent() {
                         : 'bg-gray-200 border border-gray-300 text-gray-900 rounded-bl-none'
                   }`}
                 >
-                  <p className="text-sm leading-relaxed">{message.text}</p>
+                  {message.type === 'bot' ? (
+                    renderFormattedMessage(message.text)
+                  ) : (
+                    <p className="text-sm leading-relaxed">{message.text}</p>
+                  )}
                   <p className={`text-xs mt-1 ${
                     message.type === 'user'
                       ? 'text-white/70'

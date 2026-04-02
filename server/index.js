@@ -12,9 +12,10 @@ import gmailRoutes from "./routes/gmailRoutes.js";
 import urlRoute from "./routes/urlRoute.js";
 import imageRoutes from "./routes/imageRoutes.js";
 import youtubeRoutes from "./routes/youtubeRoutes.js";
-import { launchBot } from "./services/telegramService.js";
+import chatbotRoutes from "./routes/chatbotRoutes.js";
+// import { launchBot } from "./services/telegramService.js";
 
-launchBot();
+// launchBot();
 
 const app = express();
 const server = http.createServer(app);
@@ -30,6 +31,7 @@ app.use(express.json());
 app.use("/", gmailRoutes);
 app.use("/", urlRoute);
 app.use("/", imageRoutes);
+app.use("/chatbot-ui", chatbotRoutes);
 app.use("/youtube", youtubeRoutes);
 
 // Environment variables
