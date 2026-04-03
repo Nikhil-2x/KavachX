@@ -15,6 +15,7 @@ import youtubeRoutes from "./routes/youtubeRoutes.js";
 import audioRoutes from "./routes/audio.js";
 import chatbotRoutes from "./routes/chatbotRoutes.js";
 import threatRoutes from "./routes/threatRoutes.js";
+import videoRoutes from "./routes/videoRoutes.js";
 import { launchBot } from "./services/telegramService.js";
 
 launchBot();
@@ -37,6 +38,7 @@ app.use("/youtube", youtubeRoutes);
 app.use("/", audioRoutes);
 app.use("/chatbot-ui", chatbotRoutes);
 app.use("/threat", threatRoutes);
+app.use("/", videoRoutes);
 
 // Environment variables
 const PORT = process.env.PORT || 3000;

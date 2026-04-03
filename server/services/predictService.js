@@ -72,3 +72,34 @@ export async function predictAudio(audioBuffer, fileName) {
     throw error;
   }
 }
+
+// New function for deep-fake-video prediction
+export async function predictVideo(videoBuffer, fileName) {
+  const predictionUrl = process.env.VIDEO_PREDICTION_API_URL;
+
+  if (!predictionUrl) {
+    throw new Error("Missing VIDEO_PREDICTION_API_URL in environment variables");
+  }
+
+  try {
+    const formData = new FormData();
+    // 'file' must match the parameter name expected by the video prediction API
+    formData.append("file", videoBuffer, fileName);
+
+    const response = await fetch(predictionUrl, {
+      method: "POST",
+      body: formData,
+      // Note: Do NOT set Content-Type header manually when using FormData,
+      // the library/fetch will set the boundary for you.
+    });
+
+    if (!response.ok) {
+      throw new Error(`Video API Error: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Video Prediction Error:", error);
+    throw error;
+  }
+}

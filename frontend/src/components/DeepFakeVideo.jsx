@@ -9,7 +9,7 @@ const DeepfakeVideoDetector = () => {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
-  const API_URL =import.meta.env.VITE_DEEP_FAKE_VIDEO;
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:2000";
 
   const handleUpload = (e) => {
     const selected = e.target.files?.[0];
@@ -42,7 +42,7 @@ const DeepfakeVideoDetector = () => {
     formData.append("file", file);
 
     try {
-      const res = await fetch(`${API_URL}/predict/video`, {
+      const res = await fetch(`${API_URL}/video`, {
         method: "POST",
         body: formData,
       });
@@ -57,7 +57,7 @@ const DeepfakeVideoDetector = () => {
         throw new Error(result.error || "Detection failed");
       }
 
-      setData(result);
+      setData(result.data.prediction);
     } catch (err) {
       setError(err.message || "Unable to analyze video.");
       setData(null);
