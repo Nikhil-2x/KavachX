@@ -1,4 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useNavigate,
+  useLocation,
+} from "react-router-dom";
 import Header from "./components/Header";
 import Hero from "./components/Hero";
 import Features from "./components/Features";
@@ -14,14 +21,45 @@ import ChatbotAgent from "./components/ChatbotAgent";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:2000";
 
-export default function App() {
-  const [activeTab, setActiveTab] = useState("home");
+// Tab ID → URL path mapping
+const TAB_TO_PATH = {
+  home: "/",
+  about: "/about",
+  features: "/features",
+  inbox: "/inbox",
+  deepfake: "/deepfake",
+  cyberawareness: "/cyber-awareness",
+  "website-detector": "/website-detector",
+  "attacker-intent": "/attacker-intent",
+  "threat-similarity": "/threat-similarity",
+};
+
+// URL path → Tab ID mapping (reverse)
+const PATH_TO_TAB = Object.fromEntries(
+  Object.entries(TAB_TO_PATH).map(([tab, path]) => [path, tab])
+);
+
+function AppContent() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [emails, setEmails] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const socketRef = useRef(null);
+
+  // Derive activeTab from current URL path
+  const activeTab = PATH_TO_TAB[location.pathname] || "home";
+
+  // Navigate to a URL when a tab is selected
+  const setActiveTab = (tabId) => {
+    const path = TAB_TO_PATH[tabId];
+    if (path && path !== location.pathname) {
+      navigate(path);
+    }
+  };
 
   const checkAuthStatus = async () => {
     try {
@@ -30,8 +68,10 @@ export default function App() {
       const auth = Boolean(data.authenticated);
       setIsAuthenticated(auth);
 
-      // When authenticated, show inbox by default
-      if (auth) setActiveTab("inbox");
+      // When authenticated, redirect to inbox if on home
+      if (auth && location.pathname === "/") {
+        navigate("/inbox");
+      }
     } catch (err) {
       console.error("Failed to check auth status", err);
     }
@@ -40,7 +80,6 @@ export default function App() {
   const fetchLatestEmails = async () => {
     setError("");
     setLoading(true);
-
     try {
       const res = await fetch(`${API_URL}/gmail/latest`);
       if (!res.ok) {
@@ -85,6 +124,8 @@ export default function App() {
       socketRef.current.disconnect();
       socketRef.current = null;
     }
+
+    navigate("/");
   };
 
   useEffect(() => {
@@ -92,8 +133,8 @@ export default function App() {
     if (params.get("auth") === "success") {
       window.history.replaceState({}, document.title, window.location.pathname);
     }
-
     checkAuthStatus();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -117,6 +158,17 @@ export default function App() {
     };
   }, [isAuthenticated]);
 
+  const inboxProps = {
+    isAuthenticated,
+    emails,
+    loading,
+    error,
+    onConnect: handleLoginClick,
+    onRefresh: fetchLatestEmails,
+    onStartWatch: startWatch,
+    onLogout: handleLogout,
+  };
+
   return (
     <div className="min-h-screen bg-white">
       <Header
@@ -129,32 +181,40 @@ export default function App() {
       />
 
       <main>
-        {activeTab === "home" && <Hero setActiveTab={setActiveTab} />}
-
-        {activeTab === "inbox" && (
-          <GmailInbox
-            isAuthenticated={isAuthenticated}
-            emails={emails}
-            loading={loading}
-            error={error}
-            onConnect={handleLoginClick}
-            onRefresh={fetchLatestEmails}
-            onStartWatch={startWatch}
-            onLogout={handleLogout}
+        <Routes>
+          <Route path="/" element={<Hero setActiveTab={setActiveTab} />} />
+          <Route path="/about" element={<About />} />
+          <Route
+            path="/features"
+            element={<Features setActiveTab={setActiveTab} />}
           />
-        )}
-
-        {activeTab === "features" && <Features setActiveTab={setActiveTab} />}
-        {activeTab === "about" && <About />}
-        {activeTab === "cyberawareness" && <CyberAwareness />}
-        {activeTab === "deepfake" && <DeepFakeDetector />}
-
-        {/* ⭐ NEW: Security Feature Pages */}
-        {activeTab === "website-detector" && <WebsiteDetector />}
-        {activeTab === "attacker-intent" && <AttackerIntentSimulation />}
-        {activeTab === "threat-similarity" && <ThreatSimilarityEngine />}
-        <ChatbotAgent />
+          <Route path="/inbox" element={<GmailInbox {...inboxProps} />} />
+          <Route path="/deepfake" element={<DeepFakeDetector />} />
+          <Route path="/cyber-awareness" element={<CyberAwareness />} />
+          <Route path="/website-detector" element={<WebsiteDetector />} />
+          <Route
+            path="/attacker-intent"
+            element={<AttackerIntentSimulation />}
+          />
+          <Route
+            path="/threat-similarity"
+            element={<ThreatSimilarityEngine />}
+          />
+          {/* Fallback: redirect unknown paths to home */}
+          <Route path="*" element={<Hero setActiveTab={setActiveTab} />} />
+        </Routes>
       </main>
+
+      {/* Chatbot is always visible */}
+      <ChatbotAgent />
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <Router>
+      <AppContent />
+    </Router>
   );
 }
