@@ -11,7 +11,7 @@ import WebsiteDetector from "./components/WebsiteDetector";
 import AttackerIntentSimulation from "./components/AttackerIntentSimulation";
 import ThreatSimilarityEngine from "./components/ThreatSimilarityEngine";
 import ChatbotAgent from "./components/ChatbotAgent";
-
+import DeepfakeVideoDetecter from "./components/DeepFakeVideo";
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:2000";
 
 export default function App() {
@@ -148,8 +148,7 @@ export default function App() {
         {activeTab === "about" && <About />}
         {activeTab === "cyberawareness" && <CyberAwareness />}
         {activeTab === "deepfake" && <DeepFakeDetector />}
-
-        {/* ⭐ NEW: Security Feature Pages */}
+        {activeTab === "video-detector" && <DeepfakeVideoDetecter />}
         {activeTab === "website-detector" && <WebsiteDetector />}
         {activeTab === "attacker-intent" && <AttackerIntentSimulation />}
         {activeTab === "threat-similarity" && <ThreatSimilarityEngine />}
