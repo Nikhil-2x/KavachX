@@ -1,3 +1,6 @@
+import FormData from "form-data";
+import fetch from "node-fetch";
+
 export async function predict(emailBody) {
   const predictionUrl = process.env.PREDICTION_API_URL;
 
@@ -23,6 +26,80 @@ export async function predict(emailBody) {
     return result;
   } catch (error) {
     console.error("Error calling Prediction API:", error.message);
+    throw error;
+  }
+}
+
+export async function predictURL(urlToScan) {
+  const predictionUrl = process.env.URL_PREDICTION_API_URL;
+
+  try {
+    const response = await fetch(predictionUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url: urlToScan }), // Key must be "url"
+    });
+
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error("Error:", error);
+  }
+}
+
+export async function predictAudio(audioBuffer, fileName) {
+  const predictionUrl = process.env.AUDIO_PREDICTION_API_URL;
+
+  try {
+    const formData = new FormData();
+    // 'file' must match the parameter name in FastAPI: file: UploadFile
+    formData.append("file", audioBuffer, fileName);
+
+    const response = await fetch(predictionUrl, {
+      method: "POST",
+      body: formData,
+      // Note: Do NOT set Content-Type header manually when using FormData,
+      // the library/fetch will set the boundary for you.
+    });
+
+    if (!response.ok) {
+      throw new Error(`Audio API Error: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Audio Prediction Error:", error);
+    throw error;
+  }
+}
+
+// New function for deep-fake-video prediction
+export async function predictVideo(videoBuffer, fileName) {
+  const predictionUrl = process.env.VIDEO_PREDICTION_API_URL;
+
+  if (!predictionUrl) {
+    throw new Error("Missing VIDEO_PREDICTION_API_URL in environment variables");
+  }
+
+  try {
+    const formData = new FormData();
+    // 'file' must match the parameter name expected by the video prediction API
+    formData.append("file", videoBuffer, fileName);
+
+    const response = await fetch(predictionUrl, {
+      method: "POST",
+      body: formData,
+      // Note: Do NOT set Content-Type header manually when using FormData,
+      // the library/fetch will set the boundary for you.
+    });
+
+    if (!response.ok) {
+      throw new Error(`Video API Error: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Video Prediction Error:", error);
     throw error;
   }
 }
