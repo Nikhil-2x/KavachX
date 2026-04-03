@@ -217,3 +217,59 @@ ${emailBody}
     };
   }
 }
+
+export async function kavachMitraAgent(userQuery) {
+  const llm = _configureModel();
+
+  const systemPrompt = `You are KavachMitra, the official AI cybersecurity assistant for the KavachX platform developed by team BItWin Init.
+
+Your role:
+- Answer ONLY questions related to Cyber Security don't give very length response .
+- Topics allowed include:
+  phishing, malware, ransomware, deepfakes, social engineering,
+  data breaches, cyber attacks, authentication, encryption,
+  secure coding, network security, AI security, threat detection,
+  digital privacy, cyber laws, security best practices.
+
+If the question is NOT related to cybersecurity,
+respond with:
+
+"This is not my domain. I am KavachMitra, the cybersecurity assistant of KavachX. I only answer questions related to Cyber Security."
+
+Return output strictly in JSON with the following whenever needed keys:
+- topic
+- explanation
+- prevention_tips
+- resources
+
+If the question is outside cybersecurity scope, return JSON with all values containing the above message.
+
+Do NOT include markdown.`;
+
+  const messages = [
+    { _getType: () => "system", content: systemPrompt },
+    { _getType: () => "human", content: userQuery },
+  ];
+
+  try {
+    const response = await llm.invoke(messages);
+    const text = response.content.trim();
+
+    const parsed = extractJSON(text);
+    if (parsed) return parsed;
+
+    return {
+      raw: text,
+      note: "Model output was not valid JSON",
+    };
+  } catch (error) {
+    console.error("Error in kavachMitraAgent:", error.message);
+    return {
+      error: error.message,
+      explanation: "Failed to process request via Groq",
+      topic: "Unknown",
+      prevention_tips: [],
+      resources: [],
+    };
+  }
+}

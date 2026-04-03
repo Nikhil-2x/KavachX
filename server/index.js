@@ -12,6 +12,9 @@ import gmailRoutes from "./routes/gmailRoutes.js";
 import urlRoute from "./routes/urlRoute.js";
 import imageRoutes from "./routes/imageRoutes.js";
 import youtubeRoutes from "./routes/youtubeRoutes.js";
+import audioRoutes from "./routes/audio.js";
+import chatbotRoutes from "./routes/chatbotRoutes.js";
+import threatRoutes from "./routes/threatRoutes.js";
 import { launchBot } from "./services/telegramService.js";
 
 launchBot();
@@ -31,6 +34,9 @@ app.use("/", gmailRoutes);
 app.use("/", urlRoute);
 app.use("/", imageRoutes);
 app.use("/youtube", youtubeRoutes);
+app.use("/", audioRoutes);
+app.use("/chatbot-ui", chatbotRoutes);
+app.use("/threat", threatRoutes);
 
 // Environment variables
 const PORT = process.env.PORT || 3000;
