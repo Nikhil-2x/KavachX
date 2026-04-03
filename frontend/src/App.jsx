@@ -18,7 +18,7 @@ import WebsiteDetector from "./components/WebsiteDetector";
 import AttackerIntentSimulation from "./components/AttackerIntentSimulation";
 import ThreatSimilarityEngine from "./components/ThreatSimilarityEngine";
 import ChatbotAgent from "./components/ChatbotAgent";
-
+import DeepfakeVideoDetecter from "./components/DeepFakeVideo";
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:2000";
 
 // Tab ID → URL path mapping
@@ -28,6 +28,7 @@ const TAB_TO_PATH = {
   features: "/features",
   inbox: "/inbox",
   deepfake: "/deepfake",
+  "deepfake-video": "/deepfake-video",
   cyberawareness: "/cyber-awareness",
   "website-detector": "/website-detector",
   "attacker-intent": "/attacker-intent",
@@ -190,6 +191,7 @@ function AppContent() {
           />
           <Route path="/inbox" element={<GmailInbox {...inboxProps} />} />
           <Route path="/deepfake" element={<DeepFakeDetector />} />
+          <Route path="/deepfake-video" element={<DeepfakeVideoDetecter />} />
           <Route path="/cyber-awareness" element={<CyberAwareness />} />
           <Route path="/website-detector" element={<WebsiteDetector />} />
           <Route

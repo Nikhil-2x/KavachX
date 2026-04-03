@@ -22,6 +22,7 @@ export default function Header({
     { id: "features", label: "Features" },
     ...(isAuthenticated ? [{ id: "inbox", label: "Inbox" }] : []),
     { id: "deepfake", label: "Deep Fake" },
+    { id: "deepfake-video", label: "Video Detector" },
     { id: "cyberawareness", label: "Cyber Awareness" },
   ];
 
