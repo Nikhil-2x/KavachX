@@ -16,9 +16,10 @@ import audioRoutes from "./routes/audio.js";
 import chatbotRoutes from "./routes/chatbotRoutes.js";
 import threatRoutes from "./routes/threatRoutes.js";
 import videoRoutes from "./routes/videoRoutes.js";
+import breachRoutes from "./routes/breachRoutes.js";
 import { launchBot } from "./services/telegramService.js";
 
-// launchBot();
+launchBot();
 
 const app = express();
 const server = http.createServer(app);
@@ -40,6 +41,7 @@ app.use("/", audioRoutes);
 app.use("/chatbot-ui", chatbotRoutes);
 app.use("/threat", threatRoutes);
 app.use("/", videoRoutes);
+app.use("/", breachRoutes);
 
 // Environment variables
 const PORT = process.env.PORT || 3000;
