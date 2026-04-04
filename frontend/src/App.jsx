@@ -19,6 +19,7 @@ import AttackerIntentSimulation from "./components/AttackerIntentSimulation";
 import ThreatSimilarityEngine from "./components/ThreatSimilarityEngine";
 import ChatbotAgent from "./components/ChatbotAgent";
 import DeepfakeVideoDetecter from "./components/DeepFakeVideo";
+import EmailBreachChecker from "./components/EmailBreachChecker";
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:2000";
 
 // Tab ID → URL path mapping
@@ -33,6 +34,7 @@ const TAB_TO_PATH = {
   "website-detector": "/website-detector",
   "attacker-intent": "/attacker-intent",
   "threat-similarity": "/threat-similarity",
+  "email-breach": "/email-breach",
 };
 
 // URL path → Tab ID mapping (reverse)
@@ -202,6 +204,7 @@ function AppContent() {
             path="/threat-similarity"
             element={<ThreatSimilarityEngine />}
           />
+          <Route path="/email-breach" element={<EmailBreachChecker />} />
           {/* Fallback: redirect unknown paths to home */}
           <Route path="*" element={<Hero setActiveTab={setActiveTab} />} />
         </Routes>

@@ -61,3 +61,11 @@ Content-Type: application/json
 {
     "emailBody": "Urgent: Your account has been suspended. Click here to login: http://bit.ly/fake-link"
 }
+
+### 10. email breach checker
+
+GET https://leakcheck.io/api/public?check=test@gmail.com
+
+###
+
+# GET http://breach-check?email=test@gmail.com

@@ -1,6 +1,6 @@
 // src/components/Features.jsx - UPDATED WITH NEW FEATURES
 import React from "react";
-import { Globe, AlertTriangle, Zap } from "lucide-react";
+import { Globe, AlertTriangle, Zap, Mail } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
 
 export default function Features({ setActiveTab }) {
@@ -35,6 +35,16 @@ export default function Features({ setActiveTab }) {
       gradient: "from-yellow-500 to-orange-500",
       tabId: "threat-similarity",
       color: "yellow",
+    },
+    {
+      id: 3,
+      title: "Email Breach Checker",
+      description:
+        "Check if your email has been involved in data breaches. Get detailed information about compromised accounts and take action to secure your data.",
+      icon: Mail,
+      gradient: "from-green-500 to-teal-500",
+      tabId: "email-breach",
+      color: "green",
     },
   ];
 
@@ -91,7 +101,7 @@ export default function Features({ setActiveTab }) {
         </div>
 
         {/* Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {features.map((feature, index) => {
             const Icon = feature.icon;
             return (
