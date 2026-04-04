@@ -18,7 +18,7 @@ import threatRoutes from "./routes/threatRoutes.js";
 import videoRoutes from "./routes/videoRoutes.js";
 import { launchBot } from "./services/telegramService.js";
 
-launchBot();
+// launchBot();
 
 const app = express();
 const server = http.createServer(app);
@@ -34,6 +34,7 @@ app.use(express.json());
 app.use("/", gmailRoutes);
 app.use("/", urlRoute);
 app.use("/", imageRoutes);
+app.use("/chatbot-ui", chatbotRoutes);
 app.use("/youtube", youtubeRoutes);
 app.use("/", audioRoutes);
 app.use("/chatbot-ui", chatbotRoutes);
